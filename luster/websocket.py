@@ -147,6 +147,15 @@ class WebsocketHandler:
         while self.__closed:
             await self.__handle_recv()
 
+    async def close(self) -> None:
+        """Closes the websocket connection."""
+        if self.__websocket:
+            _LOGGER.info("Websocket connection is closing.")
+            await self.__websocket.close(code=1000)
+
+        self.__websocket = None
+        self.__closed = True
+
     async def send(self, type: types.EventTypeSend, data: Dict[str, Any]) -> None:
         """Sends an event via websocket.
 
