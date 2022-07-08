@@ -144,7 +144,7 @@ class WebsocketHandler:
         self.__websocket = await session.ws_connect(url)  # type: ignore[reportUnknownMemberType]
         self.__closed = False
 
-        while True:
+        while self.__closed:
             await self.__handle_recv()
 
     async def send(self, type: types.EventTypeSend, data: Dict[str, Any]) -> None:
