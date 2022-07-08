@@ -2,7 +2,17 @@
 
 from __future__ import annotations
 
-from typing import Any, ClassVar, Generator, Literal, Optional, Type, TypeVar, overload
+from typing import (
+    Any,
+    ClassVar,
+    Coroutine,
+    Generator,
+    Literal,
+    Optional,
+    Type,
+    TypeVar,
+    overload,
+)
 from typing_extensions import Self
 
 import aiohttp
@@ -237,3 +247,54 @@ class HTTPHandler:
             return True
 
         return False
+
+    def _get_response(self, response: aiohttp.ClientResponse) -> Coroutine[Any, Any, Any]:
+        if response.content_type == "application/json":
+            return response.json()
+        return response.text()
+
+    async def request(self, method: str, route: str, **kwargs: Any) -> Any:
+        """Requests a certain route and returns the response data.
+
+        Parameters
+        ----------
+        method: :class:`str`
+            The HTTP method to use.
+        route: :class:`str`
+            The route that will be appended to :attr:`.BASE_URL`.
+        **kwargs:
+            The keyword arguments that are passed to :meth:`aiohttp.ClientSession.request`.
+            It is worth noting that provided headers will be updated to include the proper
+            authentication headers and you don't have to add any authentication headers
+            manually.
+
+            Following headers will be overwritten:
+
+            - ``X-Session-Token``
+            - ``X-Bot-Token``
+        """
+        if self.closed:
+            raise RuntimeError("HTTP handler is closed.")
+
+        # Headers construction
+        headers = kwargs.pop("headers", {})
+        to_update = {
+            "User-Agent": self.USER_AGENT,
+            "X-Bot-Token" if self._bot else "X-Session-Token": self.__token,
+        }
+        headers.update(to_update)
+
+        url = f"{self.BASE_URL}{route}"
+        session = self.__session
+
+        async with session.request(method, url, headers=headers, **kwargs) as response:  # type: ignore
+            status = response.status
+            if status == 204:
+                return None
+
+            data = await self._get_response(response)
+
+            if status < 300 and status >= 200:
+                return data
+
+            raise RuntimeError("HTTP request failed: %r" % status)
