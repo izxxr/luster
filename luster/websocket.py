@@ -10,7 +10,10 @@ from typing import (
 )
 from luster.http import HTTPHandler
 
+import asyncio
 import logging
+import random
+import time
 import json
 
 if TYPE_CHECKING:
@@ -59,6 +62,7 @@ class WebsocketHandler:
         # Connection state related data
         self.__closed: bool = True
         self.__websocket: Optional[ClientWebSocketResponse] = None
+        self.__ping_task: Optional[asyncio.Task[None]] = None
 
         if not _HAS_MSGPACK:
             _LOGGER.warning("It is recommended to install msgpack that enables faster websockets packets parsing.")
@@ -125,8 +129,26 @@ class WebsocketHandler:
         message = await self.__recv()
         message_type = message["type"]
 
+        _LOGGER.debug("Received the %r websocket event", message_type)
+
         if message_type == "Authenticated":
             _LOGGER.info("Successfully connected and logged in to Revolt.")
+            self.__ping_task = asyncio.create_task(self.__ping_task_impl(), name="luster:ping-task")
+
+        elif message_type == "Pong":
+            _LOGGER.debug("Ping has been acknowledged. %r", message)
+
+    async def __ping_task_impl(self) -> None:
+        websocket = self.__websocket
+        if websocket is None:
+            raise RuntimeError("Websocket is closed.")
+
+        interval = random.randint(10, 30)
+        _LOGGER.info("Pinging the websocket (interval: %rs)", interval)
+
+        while not self.__closed:
+            await self.send("Ping", {"data": time.time()})
+            await asyncio.sleep(interval)
 
     async def connect(self) -> None:
         """Connects the websocket.
@@ -144,7 +166,7 @@ class WebsocketHandler:
         self.__websocket = await session.ws_connect(url)  # type: ignore[reportUnknownMemberType]
         self.__closed = False
 
-        while self.__closed:
+        while not self.__closed:
             await self.__handle_recv()
 
     async def close(self) -> None:
@@ -166,6 +188,8 @@ class WebsocketHandler:
         data: :class:`dict`
             The event data, excluding ``type``.
         """
+        _LOGGER.debug("Sending the %r event.", type)
+
         websocket = self.__websocket
         if websocket is None:
             raise RuntimeError("Websocket is closed.")
