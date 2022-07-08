@@ -11,6 +11,8 @@ from typing_extensions import Self
 from luster.http import create_http_handler, HTTPHandler
 from luster.websocket import WebsocketHandler
 
+import asyncio
+
 if TYPE_CHECKING:
     from aiohttp import ClientSession
 
@@ -112,3 +114,22 @@ class Client:
             )
 
         await self.__websocket_handler.connect()
+
+    def launch(self) -> None:
+        """Launches the bot.
+
+        This is a high level of :meth:`.connect` that handles asyncio
+        event loop cleanup and provides a synchronous way of starting
+        the client.
+
+        Consider using :meth:`.connect` if you intend to have more
+        control over the event loop.
+        """
+        async def runner():
+            async with self:
+                await self.connect()
+
+        try:
+            asyncio.run(runner())
+        except KeyboardInterrupt:
+            pass
