@@ -71,6 +71,11 @@ class WebsocketHandler:
         if not _HAS_MSGPACK:
             _LOGGER.warning("It is recommended to install msgpack that enables faster websockets packets parsing.")
 
+    def __clear(self) -> None:
+        self.__closed = True
+        self.__websocket = None
+        self.__ping_task = None
+
     @property
     def http_handler(self) -> HTTPHandler:
         """The HTTP handler associated to this websocket handler.
@@ -183,11 +188,13 @@ class WebsocketHandler:
 
     async def close(self) -> None:
         """Closes the websocket connection."""
+        if self.__ping_task:
+            self.__ping_task.cancel()
         if self.__websocket:
             _LOGGER.info("Websocket connection is closing.")
             await self.__websocket.close(code=1000)
 
-        self.__websocket = None
+        self.__clear()
         self.__closed = True
 
     async def send(self, type: types.EventTypeSend, data: Dict[str, Any]) -> None:
