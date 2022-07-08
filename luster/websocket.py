@@ -49,6 +49,9 @@ class WebsocketHandler:
     ----------
     http_handler: :class:`HTTPHandler`
         The HTTP handler used for opening websocket connections.
+    version: :class:`types.WebsocketVersion`
+        The version of websocket protocol to use. Defaults to ``1`` and
+        currently there are no other options than ``1``
     """
 
     def __init__(
