@@ -1,2 +1,50 @@
 # luster
 Python library for Revolt.chat API.
+
+## Features
+- Easy to use and customize
+- Supports both bots and users API
+- Provides full control over low level API
+- Up-to-date type definitions for Revolt API
+
+## Installation
+You can install this library using the Python's traditional package manager, `pip`.
+```sh
+$ pip install luster
+```
+Note that **Python 3.8 or higher** is required.
+
+The only required dependency for this library is `aiohttp`. There are certain dependencies
+that you can install in order to enhance the speed of the library.
+
+- `msgpack` (Faster websocket packets parsing)
+- `ujson` (Faster JSON parsing)
+- `aiohttp[speed]` (Speed ups for `aiohttp`)
+
+These dependencies can be installed by:
+```sh
+$ pip install luster[speed]
+```
+
+## Basic Usage
+> :information_source: Type annotations are not required.
+
+```py
+import luster
+
+client = luster.Client(token="...")
+
+@client.listen(luster.WebsocketEvent.MESSAGE)
+async def handle_message(event: luster.events.Message):
+    message = event.message
+    if message.content == "!ping":
+        await message.channel.send("Pong!")
+
+client.launch()
+```
+
+## Contributing
+This library is still in it's alpha (0.x) phase and is undergoing active development to
+provide 100% coverage of Revolt API. Any kind of contribution is welcomed. 
+See [Contribution guidelines](https://github.com/nerdguyhmad/luster/blob/main/CONTRIBUTING.MD) for
+more information.
