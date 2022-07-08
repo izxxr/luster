@@ -14,3 +14,4 @@ __url__ = "https://github.com/nerdguyahmad/luster"
 
 from luster.client import *
 from luster.http import *
+from luster.websocket import *
