@@ -174,7 +174,7 @@ class HTTPHandler:
     async def __aexit__(self, *_) -> None:
         await self.close()
 
-    async def __await__(self) -> Generator[Any, None, Self]:
+    def __await__(self) -> Generator[Any, None, Self]:
         return self._async_init().__await__()
 
     @property
