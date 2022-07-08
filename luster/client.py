@@ -27,6 +27,25 @@ class Client(Generic[HTTPHandlerT]):
     with Revolt Events and HTTP API. This class mainly focuses on
     automating user accounts or creating bots. If you intend to
     perform simple HTTP requests, Use :class:`HTTPHandler` instead.
+
+    Parameters
+    ----------
+    token: :class:`str`
+        The bot or session token.
+    bot: :class:`bool`
+        Whether the passed ``token`` is a bot token. Set this to
+        ``False`` when a session token is passed (i.e for a user).
+        Defaults to ``True``.
+    session: Optional[:class:`aiohttp.ClientSession`]
+        The client session used for making HTTP requests.
+
+        If not provided, A session is created internally and would
+        be closed automatically after usage. Note that when a session
+        is provided by the user, It must be closed by the user. Library
+        will not take it's ownership.
+    http_handler_cls: Optional[Type[:class:`HTTPHandler`]]
+        The class type of :class:`HTTPHandler`. This can be used
+        to set custom subclasses on :attr:`.http_handler`.
     """
 
     def __init__(
