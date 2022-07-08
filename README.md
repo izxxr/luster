@@ -1,8 +1,14 @@
 # luster
 Python library for Revolt.chat API.
 
+> :warning: **Acknowledgement**
+>
+> This library is not yet complete and is currently in it's early development stage.
+> Do not use this for production yet. Expect bugs and other issues. The library is
+> is in active development and will be complete and production ready soon.
+
 ## Features
-- Easy to use and customize
+- Modern and easy to use interface
 - Supports both bots and users API
 - Provides full control over low level API
 - Up-to-date type definitions for Revolt API
