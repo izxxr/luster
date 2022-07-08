@@ -127,3 +127,15 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Misc.
+.misc/
+test.*
+
+# VSCode Settings
+# We only want to consider settings.json that includes type checker
+# configuration. The directory may include other unnecessary configuration
+# files that we will ignore.
+
+.vscode/*
+!.vscode/settings.json
