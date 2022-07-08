@@ -90,5 +90,8 @@ class NodeInfoVosoFeature(_BaseService):
     """Represents the configuration for Voso voice service configuration found in :attr:`NodeInfoFeatures.voso` field."""
 
 
-QueryNodeResponse = NodeInfo
-"""Represents the response of :meth:`HTTPHandler.query_node` or :meth:`HTTPHandler.fetch_node_info` route."""
+class QueryNodeResponse(NodeInfo):
+    """Represents the response of :meth:`HTTPHandler.query_node` or :meth:`HTTPHandler.fetch_node_info` route.
+
+    This is equivalent to :class:`NodeInfo`.
+    """
