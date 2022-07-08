@@ -53,12 +53,13 @@ class Client:
         token: str,
         bot: bool = True,
         session: Optional[ClientSession] = None,
-        http_handler_cls: Optional[Type[HTTPHandler]] = None,
+        http_handler_cls: Type[HTTPHandler] = HTTPHandler,
+        websocket_handler_cls: Type[WebsocketHandler] = WebsocketHandler,
     ) -> None:
 
         self.__http_handler = create_http_handler(token=token, bot=bot, cls=http_handler_cls,
                                                   session=session)
-        self.__websocket_handler = WebsocketHandler(http_handler=self.__http_handler)
+        self.__websocket_handler = websocket_handler_cls(http_handler=self.__http_handler)
         self.__initialized: bool = False
 
     async def __aenter__(self) -> Self:

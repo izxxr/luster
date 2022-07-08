@@ -14,6 +14,7 @@ import asyncio
 import logging
 import random
 import time
+import traceback
 import json
 
 if TYPE_CHECKING:
@@ -126,17 +127,18 @@ class WebsocketHandler:
         raise RuntimeError("Received unhandleable websocket packet")
 
     async def __handle_recv(self) -> None:
-        message = await self.__recv()
-        message_type = message["type"]
+        data = await self.__recv()
+        type = data["type"]
 
-        _LOGGER.debug("Received the %r websocket event", message_type)
+        asyncio.create_task(self.__call_recv_hook(type, data))  # type: ignore
+        _LOGGER.debug("Received the %r websocket event", type)
 
-        if message_type == "Authenticated":
+        if type == "Authenticated":
             _LOGGER.info("Successfully connected and logged in to Revolt.")
             self.__ping_task = asyncio.create_task(self.__ping_task_impl(), name="luster:ping-task")
 
-        elif message_type == "Pong":
-            _LOGGER.debug("Ping has been acknowledged. %r", message)
+        elif type == "Pong":
+            _LOGGER.debug("Ping has been acknowledged. %r", data)
 
     async def __ping_task_impl(self) -> None:
         websocket = self.__websocket
@@ -149,6 +151,13 @@ class WebsocketHandler:
         while not self.__closed:
             await self.send("Ping", {"data": time.time()})
             await asyncio.sleep(interval)
+
+    async def __call_recv_hook(self, type: types.EventTypeRecv, data: Dict[str, Any]) -> None:
+        try:
+            await self.on_websocket_event(type, data)
+        except Exception:
+            _LOGGER.error("The hook 'on_websocket_event' raised an exception.")
+            traceback.print_exc()
 
     async def connect(self) -> None:
         """Connects the websocket.
@@ -196,3 +205,17 @@ class WebsocketHandler:
 
         to_send = data.update(type=type)
         await websocket.send_json(to_send)
+
+    async def on_websocket_event(self, type: types.EventTypeRecv, data: Dict[str, Any]) -> Any:
+        """A hook that gets called whenever a websocket event is received.
+
+        By default, this does nothing. The subclasses can override this
+        method to implement custom behaviour.
+
+        Parameters
+        ----------
+        type: :class:`types.EventTypeRecv`
+            The type of event that was received.
+        data: :class:`dict`
+            The received data.
+        """
