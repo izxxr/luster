@@ -19,7 +19,7 @@ import json
 
 if TYPE_CHECKING:
     from aiohttp import ClientWebSocketResponse
-    from luster.types.websocket import GenericWebsocketEvent
+    from luster.types.websocket import BaseWebsocketEvent
     from luster import types
 
 _LOGGER = logging.getLogger(__name__)
@@ -112,7 +112,7 @@ class WebsocketHandler:
         fmt = "msgpack" if _HAS_MSGPACK else "json"
         return data["ws"] + f"?version={self.version}&format={fmt}&token={http_handler.token}"
 
-    async def __recv(self) -> GenericWebsocketEvent[types.EventTypeRecv]:
+    async def __recv(self) -> BaseWebsocketEvent:
         websocket = self.__websocket
         if websocket is None:
             raise RuntimeError("Websocket is closed.")

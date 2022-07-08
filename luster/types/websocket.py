@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 from typing import (
-    Generic,
     List,
-    TypeVar,
     TypedDict,
     Literal,
     Union,
@@ -57,11 +55,8 @@ WebsocketFormat = Literal["msgpack", "json"]
 """The available websocket protocol packet transport formats."""
 
 
-ET = TypeVar("ET", EventType, EventTypeSend, EventTypeRecv)
-
-
-class GenericWebsocketEvent(TypedDict, Generic[ET]):
-    type: ET
+class BaseWebsocketEvent(TypedDict):
+    type: EventTypeRecv
 
 
 class AuthenticateEvent(TypedDict):
@@ -126,7 +121,7 @@ class BulkEvent(TypedDict):
     type: Literal["Bulk"]
     """The type of event."""
 
-    v: List[GenericWebsocketEvent[EventTypeRecv]]
+    v: List[BaseWebsocketEvent]
     """The list of events that occured."""
 
 
