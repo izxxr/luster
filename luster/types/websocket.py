@@ -18,6 +18,8 @@ __all__ = (
     "EventTypeRecv",
     "EventType",
     "ErrorId",
+    "WebsocketVersion",
+    "WebsocketFormat",
 
     # Events (client -> server)
     "AuthenticateEvent",
@@ -47,6 +49,13 @@ EventType = Union[EventTypeSend, EventTypeRecv]
 
 ErrorId = Literal["LabelMe", "InternalError", "InvalidSession", "OnboardingNotFinished", "AlreadyAuthenticated"]
 """The IDs of errors in :class:`Error` event."""
+
+WebsocketVersion = Literal[1]
+"""The available websocket protocol versions."""
+
+WebsocketFormat = Literal["msgpack", "json"]
+"""The available websocket protocol packet transport formats."""
+
 
 ET = TypeVar("ET", EventType, EventTypeSend, EventTypeRecv)
 

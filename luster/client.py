@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from typing import (
     TYPE_CHECKING,
-    Generic,
     Optional,
     Type,
 )
 from typing_extensions import Self
-from luster.http import create_http_handler, HTTPHandlerT
+from luster.http import create_http_handler, HTTPHandler
+from luster.websocket import WebsocketHandler
 
 if TYPE_CHECKING:
     from aiohttp import ClientSession
@@ -20,7 +20,7 @@ __all__ = (
 )
 
 
-class Client(Generic[HTTPHandlerT]):
+class Client:
     """A client that interacts with Revolt API.
 
     This class provides a user friendly interface for interacting
@@ -53,11 +53,12 @@ class Client(Generic[HTTPHandlerT]):
         token: str,
         bot: bool = True,
         session: Optional[ClientSession] = None,
-        http_handler_cls: Optional[Type[HTTPHandlerT]] = None,
+        http_handler_cls: Optional[Type[HTTPHandler]] = None,
     ) -> None:
 
         self.__http_handler = create_http_handler(token=token, bot=bot, cls=http_handler_cls,
                                                   session=session)
+        self.__websocket_handler = WebsocketHandler(http_handler=self.__http_handler)
         self.__initialized: bool = False
 
     async def __aenter__(self) -> Self:
@@ -68,7 +69,7 @@ class Client(Generic[HTTPHandlerT]):
         await self._cleanup()
 
     @property
-    def http_handler(self) -> HTTPHandlerT:
+    def http_handler(self) -> HTTPHandler:
         """The HTTP handler associated to this client.
 
         Returns
@@ -76,6 +77,16 @@ class Client(Generic[HTTPHandlerT]):
         :class:`HTTPHandler`
         """
         return self.__http_handler
+
+    @property
+    def websocket_handler(self) -> WebsocketHandler:
+        """The websocket handler associated to this client.
+
+        Returns
+        -------
+        :class:`WebsocketHandler`
+        """
+        return self.__websocket_handler
 
     async def _async_init(self) -> None:
         if self.__initialized:
@@ -90,3 +101,13 @@ class Client(Generic[HTTPHandlerT]):
 
         await self.__http_handler.close()
         self.__initialized = False
+
+    async def connect(self) -> None:
+        """Connects the client to Revolt websocket."""
+        if not self.__initialized:
+            raise RuntimeError(
+                "Client is not yet properly initialized. Make sure you are calling connect() "
+                "within an async context manager"
+            )
+
+        await self.__websocket_handler.connect()
