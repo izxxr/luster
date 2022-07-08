@@ -195,7 +195,6 @@ class WebsocketHandler:
             await self.__websocket.close(code=1000)
 
         self.__clear()
-        self.__closed = True
 
     async def send(self, type: types.EventTypeSend, data: Dict[str, Any]) -> None:
         """Sends an event via websocket.
