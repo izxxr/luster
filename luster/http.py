@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import (
+    TYPE_CHECKING,
     Any,
     ClassVar,
     Coroutine,
@@ -17,6 +18,9 @@ from typing_extensions import Self
 
 import aiohttp
 import luster
+
+if TYPE_CHECKING:
+    from luster import types
 
 __all__ = (
     "HTTPHandler",
@@ -298,3 +302,20 @@ class HTTPHandler:
                 return data
 
             raise RuntimeError("HTTP request failed: %r" % status)
+
+    # Node Info
+
+    async def query_node(self) -> types.NodeInfo:
+        """Fetches the information about current Revolt instance.
+
+        This route does not require authorization.
+
+        Returns
+        -------
+        :class:`types.NodeInfo`
+        """
+        data = await self.request("GET", "/")
+        return data
+
+    fetch_node_info = query_node
+    """An alias of :meth:`.query_node` method."""
