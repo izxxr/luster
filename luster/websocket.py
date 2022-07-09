@@ -150,6 +150,10 @@ class WebsocketHandler:
         elif type == "Pong":
             _LOGGER.debug("Ping has been acknowledged. %r", data)
 
+        handler = self.__events_handler
+        if handler:
+            await handler.call_handler(type, data)  # type: ignore
+
     async def __ping_task_impl(self) -> None:
         websocket = self.__websocket
         if websocket is None:
