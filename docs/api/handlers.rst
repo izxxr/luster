@@ -21,6 +21,8 @@ HTTPHandler
 .. autoclass:: HTTPHandler
     :members:
 
+.. autofunction:: create_http_handler
+
 WebsocketHandler
 ----------------
 
