@@ -12,3 +12,6 @@ class WebsocketEvent:
 
     AUTHENTICATED = "Authenticated"
     """The authenticated event is emitted right after authenticating the websocket session."""
+
+    PONG = "Pong"
+    """The pong event is emitted when client pings the websocket."""

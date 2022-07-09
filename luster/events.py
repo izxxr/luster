@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from luster.enums import WebsocketEvent
 
 if TYPE_CHECKING:
@@ -27,6 +28,7 @@ class BaseEvent(ABC):
         """
 
 
+@dataclass
 class Authenticated(BaseEvent):
     """An event emitted after authenticating the websocket session.
 
@@ -36,3 +38,14 @@ class Authenticated(BaseEvent):
     """
     def get_event_name(self) -> EventTypeRecv:
         return WebsocketEvent.AUTHENTICATED
+
+
+@dataclass
+class Pong(BaseEvent):
+    """An event emitted when client pings the websocket."""
+
+    data: Any
+    """The data sent during the ping event."""
+
+    def get_event_name(self) -> EventTypeRecv:
+        return WebsocketEvent.PONG
