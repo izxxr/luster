@@ -8,7 +8,7 @@ Welcome to Luster's documentation!
 
 Python library for Revolt.chat API.
 
-.. warning:: Acknowledgement
+.. warning::
 
    This library is not yet complete and is currently in it's early development stage.
    Do not use this for production yet. Expect bugs and other issues. The library is
