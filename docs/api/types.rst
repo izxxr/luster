@@ -1,4 +1,4 @@
-.. currentmodule:: luster
+.. currentmodule:: luster.types
 
 .. _api-types:
 
@@ -67,28 +67,24 @@ NodeInfoCaptchaFeature
 
 .. autoclass:: NodeInfoCaptchaFeature()
     :members:
-    :inherited-members:
 
 NodeInfoAutumnFeature
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: NodeInfoAutumnFeature()
     :members:
-    :inherited-members:
 
 NodeInfoJanuaryFeature
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: NodeInfoJanuaryFeature()
     :members:
-    :inherited-members:
 
 NodeInfoVosoFeature
 ~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: NodeInfoVosoFeature()
     :members:
-    :inherited-members:
 
 
 HTTP Routes
