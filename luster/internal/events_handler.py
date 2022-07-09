@@ -12,11 +12,13 @@ from typing import (
     TYPE_CHECKING,
 )
 from abc import ABC, abstractmethod
+from luster.exceptions import WebsocketError
 
 import asyncio
 import inspect
 import logging
 import traceback
+
 
 if TYPE_CHECKING:
     from luster.events import BaseEvent
@@ -221,3 +223,8 @@ class EventsHandler(ListenersMixin):
         # TODO: Revolt API currently does not send a PONG event for
         # some reason and I suspect that's a bug.
         _LOGGER.debug("Ping has been acknowledged. (ts: %r)", data["data"])
+
+    @event_handler("Error")
+    async def on_error(self, data: types.ErrorEvent) -> None:
+        error = data["error"]
+        raise WebsocketError(error)
