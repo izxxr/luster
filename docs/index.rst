@@ -29,6 +29,7 @@ Python library for Revolt.chat API.
    installation
    api/index
    contributing
+   releases
 
 Indices and tables
 ==================
