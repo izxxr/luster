@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from typing import (
     TYPE_CHECKING,
+    Callable,
     Optional,
     Type,
 )
 from typing_extensions import Self
+from luster.internal.events_handler import BE, EventsHandler, ListenersMixin, Listener
 from luster.http import create_http_handler, HTTPHandler
 from luster.websocket import WebsocketHandler
 
@@ -15,6 +17,7 @@ import asyncio
 
 if TYPE_CHECKING:
     from aiohttp import ClientSession
+    from luster.types.websocket import EventTypeRecv
 
 
 __all__ = (
@@ -22,7 +25,7 @@ __all__ = (
 )
 
 
-class Client:
+class Client(ListenersMixin):
     """A client that interacts with Revolt API.
 
     This class provides a user friendly interface for interacting
@@ -62,7 +65,11 @@ class Client:
         self.__http_handler = create_http_handler(token=token, bot=bot, cls=http_handler_cls,
                                                   session=session)
         self.__websocket_handler = websocket_handler_cls(http_handler=self.__http_handler)
+        self.__events_handler = EventsHandler()
         self.__initialized: bool = False
+
+        # _set_events_handler is an internal method.
+        self.__websocket_handler._set_events_handler(self.__events_handler)  # type: ignore[reportPrivateUsage]
 
     async def __aenter__(self) -> Self:
         await self._async_init()
@@ -70,6 +77,9 @@ class Client:
 
     async def __aexit__(self, *_) -> None:
         await self._cleanup()
+
+    def _get_events_handler(self) -> EventsHandler:
+        return self.__events_handler
 
     @property
     def http_handler(self) -> HTTPHandler:
@@ -90,6 +100,19 @@ class Client:
         :class:`WebsocketHandler`
         """
         return self.__websocket_handler
+
+    def listen(self, event: EventTypeRecv) -> Callable[[Listener[BE]], Listener[BE]]:
+        """A decorator for registering an event listener.
+
+        Parameters
+        ----------
+        event: :class:`types.EventTypeRecv`
+            The event to listen to.
+        """
+        def __wrap(func: Listener[BE]) -> Listener[BE]:
+            self.add_listener(event, func)
+            return func
+        return __wrap
 
     async def _async_init(self) -> None:
         if self.__initialized:

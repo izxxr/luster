@@ -16,8 +16,10 @@ import random
 import time
 import traceback
 
+
 if TYPE_CHECKING:
     from aiohttp import ClientWebSocketResponse
+    from luster.internal.events_handler import EventsHandler
     from luster.types.websocket import BaseWebsocketEvent
     from luster import types
 
@@ -57,8 +59,9 @@ class WebsocketHandler:
         version: types.WebsocketVersion = 1,
     ) -> None:
 
-        self.__http_handler = http_handler
         self.version = version
+        self.__http_handler = http_handler
+        self.__events_handler: Optional[EventsHandler] = None
 
         # Connection state related data
         self.__closed: bool = True
@@ -72,6 +75,9 @@ class WebsocketHandler:
         self.__closed = True
         self.__websocket = None
         self.__ping_task = None
+
+    def _set_events_handler(self, handler: EventsHandler) -> None:
+        self.__events_handler = handler
 
     @property
     def http_handler(self) -> HTTPHandler:
@@ -139,7 +145,6 @@ class WebsocketHandler:
         _LOGGER.debug("Received the %r websocket event", type)
 
         if type == "Authenticated":
-            _LOGGER.info("Successfully connected and logged in to Revolt.")
             self.__ping_task = asyncio.create_task(self.__ping_task_impl(), name="luster:ping-task")
 
         elif type == "Pong":

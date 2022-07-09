@@ -27,7 +27,9 @@ __all__ = (
 
     # Events (server -> client)
     "ErrorEvent",
+    "AuthenticatedEvent",
     "BulkEvent",
+    "PongEvent",
 )
 
 EventTypeSend = Literal["Authenticate", "BeginTyping", "EndTyping", "Ping"]
