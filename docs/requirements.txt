@@ -1,2 +1,3 @@
-furo
-aiohttp
+sphinx==4.2.0
+furo==2022.6.21
+aiohttp==3.8.0
