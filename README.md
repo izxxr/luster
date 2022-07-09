@@ -1,7 +1,7 @@
 # luster
 Python library for Revolt.chat API.
 
-**[Documentation](https://luster.readthedocs.io) • [Revolt Server]()**
+**[Documentation](https://luster.readthedocs.io) • [Revolt Server](https://app.revolt.chat/invite/SfzyrsrA)**
 
 > :warning: **Acknowledgement**
 >
