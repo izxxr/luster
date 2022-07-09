@@ -1,11 +1,15 @@
 # luster
 Python library for Revolt.chat API.
 
+**[Documentation](https://luster.readthedocs.io) • [Revolt Server]()**
+
 > :warning: **Acknowledgement**
 >
 > This library is not yet complete and is currently in it's early development stage.
 > Do not use this for production yet. Expect bugs and other issues. The library is
 > is in active development and will be complete and production ready soon.
+>
+> Join our [Revolt Server]()
 
 ## Features
 - Modern and easy to use interface
@@ -55,5 +59,5 @@ client.launch()
 ## Contributing
 This library is still in it's alpha (0.x) phase and is undergoing active development to
 provide 100% coverage of Revolt API. Any kind of contribution is welcomed. 
-See [Contribution guidelines](https://github.com/nerdguyhmad/luster/blob/main/CONTRIBUTING.MD) for
+See [Contribution guidelines](https://luster.readthedocs.io/contributing.html) for
 more information.
