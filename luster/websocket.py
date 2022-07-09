@@ -163,7 +163,7 @@ class WebsocketHandler:
         _LOGGER.info("Pinging the websocket (interval: %rs)", interval)
 
         while not self.__closed:
-            await self.send("Ping", {"data": time.time()})
+            await self.send("Ping", {"data": int(time.time())})
             await asyncio.sleep(interval)
 
     async def __call_recv_hook(self, type: types.EventTypeRecv, data: Dict[str, Any]) -> None:
@@ -218,8 +218,8 @@ class WebsocketHandler:
         if websocket is None:
             raise RuntimeError("Websocket is closed.")
 
-        to_send = data.update(type=type)
-        await websocket.send_json(to_send)
+        data.update(type=type)
+        await websocket.send_json(data)
 
     async def on_websocket_event(self, type: types.EventTypeRecv, data: Dict[str, Any]) -> Any:
         """A hook that gets called whenever a websocket event is received.
