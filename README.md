@@ -9,9 +9,10 @@ Python library for Revolt.chat API.
 
 ## Features
 - Modern and easy to use interface
-- Supports both bots and users API
-- Provides full control over low level API
-- Up-to-date type definitions for Revolt API
+- Fully typed and compatible with most type checkers
+- Supports operations with both bots and users API
+- Provides maximum control over the low level API
+- Type definitions for Revolt API
 
 ## Installation
 You can install this library using the Python's traditional package manager, `pip`.
@@ -46,6 +47,10 @@ async def handle_authenticated(event: luster.events.Authenticated):
 
 client.launch()
 ```
+
+> Basic operations such as sending messages are not yet supported. You
+> can use the low level API such as `HTTPHandler` and `WebsocketHandler`
+> to manually interact with Revolt API.
 
 ## Contributing
 This library is still in it's alpha (0.x) phase and is undergoing active development to
