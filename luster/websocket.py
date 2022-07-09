@@ -15,7 +15,6 @@ import logging
 import random
 import time
 import traceback
-import json
 
 if TYPE_CHECKING:
     from aiohttp import ClientWebSocketResponse
@@ -34,9 +33,7 @@ else:
 try:
     import ujson as json  # type: ignore
 except ImportError:
-    _HAS_UJSON = False  # type: ignore[reportConstantRedefintion]
-else:
-    _HAS_UJSON = True
+    import json
 
 
 class WebsocketHandler:
