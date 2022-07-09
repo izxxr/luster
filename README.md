@@ -40,11 +40,9 @@ import luster
 
 client = luster.Client(token="...")
 
-@client.listen(luster.WebsocketEvent.MESSAGE)
-async def handle_message(event: luster.events.Message):
-    message = event.message
-    if message.content == "!ping":
-        await message.channel.send("Pong!")
+@client.listen(luster.WebsocketEvent.AUTHENTICATED)
+async def handle_authenticated(event: luster.events.Authenticated):
+    print("Client has connected!")
 
 client.launch()
 ```
