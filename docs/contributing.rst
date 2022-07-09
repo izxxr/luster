@@ -29,7 +29,7 @@ Following are general conventions for Luster source code:
 - **Type checking:** Luster is a typed library. When contributing and modifying the source
   code, It is important to use a type checker to ensure that there are no typing issues
   in the code.
-- **Docstrings:** Docstrings are written in Numpy and Google format. See `sphinx.ext.napoleon <https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html>`
+- **Docstrings:** Docstrings are written in Numpy and Google format. See `sphinx.ext.napoleon <https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html>`_
   documentation for more information.
 - **Formatting:** The source code must be formatted properly according to Python formatting conventions
   as described in PEP-8. There's currently no specific automatic formatter used by this project.
