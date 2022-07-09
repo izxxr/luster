@@ -7,6 +7,7 @@ from typing import (
     Any,
     ClassVar,
     Coroutine,
+    Dict,
     Generator,
     Literal,
     Optional,
@@ -15,6 +16,12 @@ from typing import (
     overload,
 )
 from typing_extensions import Self
+from luster.exceptions import (
+    HTTPException,
+    HTTPForbidden,
+    HTTPNotFound,
+    HTTPServerError,
+)
 
 import aiohttp
 import luster
@@ -28,6 +35,12 @@ __all__ = (
 )
 
 HTTPHandlerT = TypeVar("HTTPHandlerT", bound="HTTPHandler")
+
+STATUS_CODE_EXCEPTIONS: Dict[int, Type[HTTPException]] = {
+    401: HTTPForbidden,
+    403: HTTPForbidden,
+    404: HTTPNotFound,
+}
 
 
 @overload
@@ -301,7 +314,14 @@ class HTTPHandler:
             if status < 300 and status >= 200:
                 return data
 
-            raise RuntimeError("HTTP request failed: %r" % status)
+            if status in STATUS_CODE_EXCEPTIONS:
+                exc = STATUS_CODE_EXCEPTIONS[status](response, data)
+                raise exc
+
+            if status >= 500:
+                raise HTTPServerError(response, data)
+
+            raise HTTPException(response, data)
 
     # Node Info
 

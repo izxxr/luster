@@ -12,6 +12,8 @@ __author__ = "I. Ahmad (nerdguyahmad) <nerdguyahmad.contact@gmail.com>"
 __url__ = "https://github.com/nerdguyahmad/luster"
 
 
+from luster import events as events
 from luster.client import *
+from luster.exceptions import *
 from luster.http import *
 from luster.websocket import *
