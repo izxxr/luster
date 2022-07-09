@@ -200,7 +200,7 @@ class EventsHandler(ListenersMixin):
         self.listeners: Dict[EventTypeRecv, List[Listener[Any]]] = {}
         self.__handlers: Dict[EventTypeRecv, Handler] = {}
 
-        for member in inspect.getmembers(self):
+        for _, member in inspect.getmembers(self):
             if hasattr(member, "__luster_event_handler__"):
                 self.__handlers[member.__luster_event_handler__] = member  # type: ignore[reportUnknownMemberAccess]
 
