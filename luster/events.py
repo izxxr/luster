@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
+from luster.enums import WebsocketEvent
 
 if TYPE_CHECKING:
     from luster.types.websocket import EventTypeRecv
@@ -24,3 +25,14 @@ class BaseEvent(ABC):
         -------
         :class:`types.EventTypeRecv`
         """
+
+
+class Authenticated(BaseEvent):
+    """An event emitted after authenticating the websocket session.
+
+    This event can be used as an indication that client has successfully
+    initiated the websocket session and is now ready for receiving data
+    over websocket.
+    """
+    def get_event_name(self) -> EventTypeRecv:
+        return WebsocketEvent.AUTHENTICATED

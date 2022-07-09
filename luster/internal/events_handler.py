@@ -13,6 +13,7 @@ from typing import (
 )
 from abc import ABC, abstractmethod
 from luster.exceptions import WebsocketError
+from luster import events
 
 import asyncio
 import inspect
@@ -217,6 +218,9 @@ class EventsHandler(ListenersMixin):
     @event_handler("Authenticated")
     async def on_authenticated(self, data: types.AuthenticatedEvent) -> None:
         _LOGGER.info("Successfully connected and logged in to Revolt.")
+
+        event = events.Authenticated()
+        self.call_listeners(event)
 
     @event_handler("Pong")
     async def on_pong(self, data: types.PongEvent) -> None:
