@@ -153,7 +153,7 @@ class ListenersMixin(ABC):
             )
             traceback.print_exc()
 
-    def call_listeners(self, event: EventTypeRecv, data: Any) -> None:
+    def call_listeners(self, data: BaseEvent) -> None:
         """Calls the listeners for the given event.
 
         The ``data`` parameter is the instance of subclass of
@@ -165,8 +165,6 @@ class ListenersMixin(ABC):
 
         Parameters
         ----------
-        event: :class:`types.EventTypeRecv`
-            The event to call listeners for.
         data: :class:`BaseEvent`
             The event information.
 
@@ -176,8 +174,9 @@ class ListenersMixin(ABC):
             No event loop is running.
         """
         handler = self._get_events_handler()
-        listeners = handler.listeners.get(event, [])
+        name = data.get_event_name()
 
+        listeners = handler.listeners.get(name, [])
         loop = asyncio.get_running_loop()
 
         for listener in listeners:
