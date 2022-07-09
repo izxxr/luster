@@ -70,7 +70,9 @@ class NodeInfoCaptchaFeature(TypedDict):
     """The client key used for solving the captcha."""
 
 
-class _BaseService(TypedDict):
+class NodeInfoAutumnFeature(TypedDict):
+    """Represents the configuration for Autumn file server found in :attr:`NodeInfoFeatures.autumn` field."""
+
     enabled: bool
     """Whether the service is enabled."""
 
@@ -78,16 +80,24 @@ class _BaseService(TypedDict):
     """The URL pointing to this service."""
 
 
-class NodeInfoAutumnFeature(_BaseService):
-    """Represents the configuration for Autumn file server found in :attr:`NodeInfoFeatures.autumn` field."""
-
-
-class NodeInfoJanuaryFeature(_BaseService):
+class NodeInfoJanuaryFeature(TypedDict):
     """Represents the configuration for January proxy service configuration found in :attr:`NodeInfoFeatures.january` field."""
 
+    enabled: bool
+    """Whether the service is enabled."""
 
-class NodeInfoVosoFeature(_BaseService):
+    url: str
+    """The URL pointing to this service."""
+
+
+class NodeInfoVosoFeature(TypedDict):
     """Represents the configuration for Voso voice service configuration found in :attr:`NodeInfoFeatures.voso` field."""
+
+    enabled: bool
+    """Whether the service is enabled."""
+
+    url: str
+    """The URL pointing to this service."""
 
 
 class QueryNodeResponse(NodeInfo):

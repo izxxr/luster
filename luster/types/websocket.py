@@ -6,19 +6,17 @@ from typing import (
     List,
     TypedDict,
     Literal,
-    Union,
+    TYPE_CHECKING,
 )
+
+if TYPE_CHECKING:
+    from luster.types.enums import (
+        EventTypeRecv,
+        ErrorId,
+    )
 
 
 __all__ = (
-    # Enums
-    "EventTypeSend",
-    "EventTypeRecv",
-    "EventType",
-    "ErrorId",
-    "WebsocketVersion",
-    "WebsocketFormat",
-
     # Events (client -> server)
     "AuthenticateEvent",
     "BeginTypingEvent",
@@ -31,31 +29,6 @@ __all__ = (
     "BulkEvent",
     "PongEvent",
 )
-
-EventTypeSend = Literal["Authenticate", "BeginTyping", "EndTyping", "Ping"]
-"""The types of event that are sent by the client."""
-
-EventTypeRecv = Literal["Error", "Authenticated", "Bulk", "Pong", "Ready",
-                        "Message", "MessageUpdate", "MessageAppend", "MessageDelete",
-                        "ChannelCreate", "ChannelUpdate", "ChannelDelete", "ChannelGroupJoin",
-                        "ChannelGroupLeave", "ChannelStartTyping", "ChannelStopTyping", "ChannelAck",
-                        "ServerCreate", "ServerUpdate", "ServerDelete", "ServerMemberJoin",
-                        "ServerMemberUpdate", "ServerMemberLeave", "ServerRoleUpdate", "ServerRoleDelete",
-                        "UserUpdate", "UserRelationship", "EmojiCreate", "EmojiDelete"]
-"""The types of event that are received by the client."""
-
-EventType = Union[EventTypeSend, EventTypeRecv]
-"""The types of event sent or received by the client over websocket."""
-
-ErrorId = Literal["LabelMe", "InternalError", "InvalidSession", "OnboardingNotFinished", "AlreadyAuthenticated"]
-"""The IDs of errors in :class:`Error` event."""
-
-WebsocketVersion = Literal[1]
-"""The available websocket protocol versions."""
-
-WebsocketFormat = Literal["msgpack", "json"]
-"""The available websocket protocol packet transport formats."""
-
 
 class BaseWebsocketEvent(TypedDict):
     type: EventTypeRecv
