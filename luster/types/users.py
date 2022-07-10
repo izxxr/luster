@@ -67,7 +67,7 @@ class User(TypedDict):
     avatar: NotRequired[Optional[File]]
     """The user's avatar."""
 
-    relations: NotRequired[Optional[List[RelationshipStatus]]]
+    relations: NotRequired[Optional[List[Relationship]]]
     """The user's relationships with other users."""
 
     badges: NotRequired[Optional[int]]
