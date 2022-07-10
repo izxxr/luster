@@ -48,7 +48,7 @@ class RelationshipStatus:
     BLOCKED = "Blocked"
     """Blocked user."""
 
-    BLOCKED_OTHER = "Blocked"
+    BLOCKED_OTHER = "BlockedOther"
     """Blocked other user."""
 
 
