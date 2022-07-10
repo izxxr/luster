@@ -13,3 +13,9 @@ WebsocketEvent
 
 .. autoclass:: WebsocketEvent
     :members:
+
+FileType
+--------
+
+.. autoclass:: FileType
+    :members:

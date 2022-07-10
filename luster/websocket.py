@@ -76,8 +76,17 @@ class WebsocketHandler:
         self.__websocket = None
         self.__ping_task = None
 
-    def _set_events_handler(self, handler: EventsHandler) -> None:
+    def set_events_handler(self, handler: EventsHandler) -> None:
         self.__events_handler = handler
+
+    def get_event_handler(self) -> Optional[EventsHandler]:
+        return self.__events_handler
+
+    def remove_event_handler(self) -> Optional[EventsHandler]:
+        handler = self.__events_handler
+        if handler:
+            self.__events_handler = None
+            return handler
 
     @property
     def http_handler(self) -> HTTPHandler:
