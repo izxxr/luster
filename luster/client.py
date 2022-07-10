@@ -12,6 +12,7 @@ from typing_extensions import Self
 from luster.internal.events_handler import BE, EventsHandler, ListenersMixin, Listener
 from luster.http import create_http_handler, HTTPHandler
 from luster.websocket import WebsocketHandler
+from luster.state import State
 
 import asyncio
 
@@ -62,14 +63,14 @@ class Client(ListenersMixin):
         websocket_handler_cls: Type[WebsocketHandler] = WebsocketHandler,
     ) -> None:
 
-        self.__http_handler = create_http_handler(token=token, bot=bot, cls=http_handler_cls,
-                                                  session=session)
+        self.__http_handler = create_http_handler(token=token, bot=bot, cls=http_handler_cls, session=session)
         self.__websocket_handler = websocket_handler_cls(http_handler=self.__http_handler)
+        self.__state = State(http_handler=self.__http_handler, websocket_handler=self.__websocket_handler)
         self.__events_handler = EventsHandler()
         self.__initialized: bool = False
 
-        # _set_events_handler is an internal method.
-        self.__websocket_handler._set_events_handler(self.__events_handler)  # type: ignore[reportPrivateUsage]
+        self.__state.set_client(self)
+        self.__websocket_handler.set_events_handler(self.__events_handler) 
 
     async def __aenter__(self) -> Self:
         await self._async_init()
@@ -100,6 +101,16 @@ class Client(ListenersMixin):
         :class:`WebsocketHandler`
         """
         return self.__websocket_handler
+
+    @property
+    def state(self) -> State:
+        """The state associated to this client.
+
+        Returns
+        -------
+        :class:`State`
+        """
+        return self.__state
 
     def listen(self, event: EventTypeRecv) -> Callable[[Listener[BE]], Listener[BE]]:
         """A decorator for registering an event listener.

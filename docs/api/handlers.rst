@@ -28,3 +28,9 @@ WebsocketHandler
 
 .. autoclass:: WebsocketHandler
     :members:
+
+State
+-----
+
+.. autoclass:: State
+    :members:

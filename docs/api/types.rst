@@ -43,6 +43,18 @@ This section documents various enumerations from the Revolt API. All these are t
 
     The formats used for packets transport in Revolt websocket protocol.
 
+.. data:: FileType
+
+    The types of file.
+
+.. data:: PresenceType
+
+    The presence states of a user.
+
+.. data:: RelationshipStatus
+
+    The status of a relationship.
+
 
 API Models
 ----------
@@ -84,6 +96,38 @@ NodeInfoVosoFeature
 ~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: NodeInfoVosoFeature()
+    :members:
+
+User
+~~~~
+
+.. autoclass:: User()
+    :members:
+
+UserStatus
+~~~~~~~~~~
+
+.. autoclass:: UserStatus()
+    :members:
+
+UserProfile
+~~~~~~~~~~~
+
+.. autoclass:: UserProfile()
+    :members:
+
+
+PartialUserBot
+~~~~~~~~~~~~~~
+
+.. autoclass:: PartialUserBot()
+    :members:
+
+
+Relationship
+~~~~~~~~~~~~
+
+.. autoclass:: Relationship()
     :members:
 
 

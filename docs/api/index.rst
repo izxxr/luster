@@ -14,5 +14,6 @@ ease of navigation, this section is further divided into sub-sections.
 
     client
     handlers
-    types
+    models
     enums
+    types
