@@ -253,3 +253,12 @@ class User(StateAware):
         self.profile = Profile(profile, self) if profile else None
         self.status = Status(status, self) if status else None
         self.bot = PartialUserBot(bot, self) if bot else None
+
+    def is_bot(self) -> bool:
+        """Indicates if the user is a bot.
+
+        Returns
+        -------
+        :class:`bool`
+        """
+        return self.bot is not None
