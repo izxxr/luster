@@ -88,7 +88,7 @@ class File(StateAware):
         self._update_from_data(data)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(id={self.id}, filename={self.filename}, content_type={self.content_type}, tag={self.tag})"
+        return f"{self.__class__.__name__}(id={self.id!r}, filename={self.filename!r}, content_type={self.content_type!r}, tag={self.tag!r})"
 
     def _update_from_data(self, data: FileData):
         self.id = data["_id"]
@@ -108,6 +108,16 @@ class File(StateAware):
     def _unroll_metadata(self, data: FileData):
         metadata = data["metadata"]
         self.type = metadata["type"]
+
+    @property
+    def url(self) -> str:
+        """The URL of this file.
+
+        Returns
+        -------
+        :class:`str`
+        """
+        return f"https://autumn.revolt.chat/{self.tag}/{self.id}"
 
     def is_attachment(self) -> bool:
         """Indicates whether this file is uploaded as a message attachment.

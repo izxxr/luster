@@ -231,7 +231,7 @@ class User(StateAware):
         self._update_from_data(data)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(id={self.id}, username={self.username})"
+        return f"{self.__class__.__name__}(id={self.id!r}, username={self.username!r})"
 
     def _update_from_data(self, data: UserData):
         self.id = data["_id"]
