@@ -14,3 +14,34 @@ File
 
 .. autoclass:: File
     :members:
+
+User
+~~~~
+
+.. autoclass:: User
+    :members:
+
+Relationship
+~~~~~~~~~~~~
+
+.. autoclass:: Relationship
+    :members:
+
+Status
+~~~~~~
+
+.. autoclass:: Status
+    :members:
+
+Profile
+~~~~~~~
+
+.. autoclass:: Profile
+    :members:
+
+
+PartialUserBot
+~~~~~~~~~~~~~~
+
+.. autoclass:: PartialUserBot
+    :members:

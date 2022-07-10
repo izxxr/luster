@@ -19,3 +19,15 @@ FileType
 
 .. autoclass:: FileType
     :members:
+
+RelationshipStatus
+------------------
+
+.. autoclass:: RelationshipStatus
+    :members:
+
+PresenceType
+------------
+
+.. autoclass:: PresenceType
+    :members:

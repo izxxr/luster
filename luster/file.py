@@ -33,7 +33,7 @@ class File(StateAware):
         The `content type <https://en.wikipedia.org/wiki/Media_type>`_ of this file.
     size: :class:`int`
         The size of this file, in bytes.
-    type: :class:`types.FileType`
+    type: :data:`types.FileType`
         The type of this file.
 
         .. seealso:: :class:`FileType` enum

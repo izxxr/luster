@@ -12,6 +12,10 @@ __author__ = "I. Ahmad (nerdguyahmad) <nerdguyahmad.contact@gmail.com>"
 __url__ = "https://github.com/nerdguyahmad/luster"
 
 
+# Sort alphabatically
+# Exception: Imports like 'from luster import events as events' should 
+# be kept on top.
+
 from luster import events as events
 from luster.client import *
 from luster.enums import *
@@ -19,4 +23,5 @@ from luster.exceptions import *
 from luster.file import *
 from luster.http import *
 from luster.state import *
+from luster.users import *
 from luster.websocket import *

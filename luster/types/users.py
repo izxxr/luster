@@ -24,7 +24,7 @@ class UserStatus(TypedDict):
     text: NotRequired[Optional[str]]
     """The custom status text."""
 
-    presense: PresenceType
+    presence: NotRequired[Optional[PresenceType]]
     """The current presence state of the user."""
 
 
