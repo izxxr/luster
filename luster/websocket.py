@@ -8,6 +8,7 @@ from typing import (
     Dict,
     Optional,
 )
+from luster.internal.mixins import StateManagementMixin
 from luster.http import HTTPHandler
 
 import asyncio
@@ -15,6 +16,7 @@ import logging
 import random
 import time
 import traceback
+
 
 
 if TYPE_CHECKING:
@@ -38,7 +40,7 @@ except ImportError:
     import json
 
 
-class WebsocketHandler:
+class WebsocketHandler(StateManagementMixin):
     """A class that handles websocket connection with Revolt Events API.
 
     This is a low level interface of :class:`Client` that provides interface

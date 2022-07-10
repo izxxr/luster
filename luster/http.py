@@ -16,6 +16,7 @@ from typing import (
     overload,
 )
 from typing_extensions import Self
+from luster.internal.mixins import StateManagementMixin
 from luster.exceptions import (
     HTTPException,
     HTTPForbidden,
@@ -123,7 +124,7 @@ def create_http_handler(
     return handler
 
 
-class HTTPHandler:
+class HTTPHandler(StateManagementMixin):
     """A class that handles HTTP requests to Revolt API.
 
     In most cases, you might not need to interact with this class.

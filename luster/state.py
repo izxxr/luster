@@ -39,6 +39,9 @@ class State:
         self.__websocket_handler = websocket_handler
         self.__client: Optional[Client] = None
 
+        http_handler.set_state(self)
+        websocket_handler.set_state(self)
+
     def set_client(self, client: Client) -> None:
         self.__client = client
 
