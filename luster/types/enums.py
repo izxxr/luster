@@ -14,7 +14,8 @@ __all__ = (
     "WebsocketFormat",
     "FileType",
     "PresenceType",
-    "RelationshipStatus"
+    "RelationshipStatus",
+    "UserRemoveField",
 )
 
 
@@ -38,3 +39,4 @@ FileType = Literal["File"]
 # Users
 PresenceType = Literal["Online", "Idle", "Busy", "Invisible"]
 RelationshipStatus = Literal["None", "User", "Friend", "Outgoing", "Incoming", "Blocked", "BlockedOther"]
+UserRemoveField = Literal["Avatar", "StatusText", "StatusPresence", "ProfileContent", "ProfileBackground"]

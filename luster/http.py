@@ -340,3 +340,75 @@ class HTTPHandler(StateManagementMixin):
 
     fetch_node_info = query_node
     """An alias of :meth:`.query_node` method."""
+
+    # Users
+
+    async def fetch_self(self) -> types.FetchSelfResponse:
+        """Fetches the user information for current authenticated user.
+
+        Returns
+        -------
+        :class:`types.FetchSelfResponse`
+        """
+        data = await self.request("GET", "/users/@me")
+        return data
+
+    async def edit_user(self, json: types.EditUserJSON) -> types.EditUserResponse:
+        """Edits the current user.
+
+        Parameters
+        ----------
+        json: :class:`types.EditUserJSON`
+            The JSON body for request.
+
+        Returns
+        -------
+        :class:`types.EditUserResponse`
+        """
+        data = await self.request("PATCH", "/users/@me", json=json)
+        return data
+
+    async def fetch_user(self, user_id: str) -> types.FetchUserResponse:
+        """Fetches the user of given ID.
+
+        Parameters
+        ----------
+        user_id: :class:`str`
+            The ID of user to fetch.
+
+        Returns
+        -------
+        :class:`types.FetchUserResponse`
+        """
+        data = await self.request("GET", f"/users/{user_id}")
+        return data
+
+    async def change_username(self, json: types.ChangeUsernameJSON) -> types.ChangeUsernameResponse:
+        """Changes the username of current user.
+
+        Parameters
+        ----------
+        json: :class:`types.EditUserJSON`
+            The JSON body for request.
+
+        Returns
+        -------
+        :class:`types.ChangeUsernameResponse`
+        """
+        data = await self.request("PATCH", "/users/@me/username", json=json)
+        return data
+
+    async def fetch_profile(self, user_id: int) -> types.FetchUserProfileResponse:
+        """Fetch a user's profile.
+
+        Parameters
+        ----------
+        json: :class:`types.EditUserJSON`
+            The JSON body for request.
+
+        Returns
+        -------
+        :class:`types.FetchUserProfileResponse`
+        """
+        data = await self.request("GET", "/users/@me/profile")
+        return data

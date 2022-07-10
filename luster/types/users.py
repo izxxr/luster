@@ -7,14 +7,24 @@ from typing_extensions import NotRequired
 from luster.types.file import File
 
 if TYPE_CHECKING:
-    from luster.types.enums import PresenceType, RelationshipStatus
+    from luster.types.enums import PresenceType, RelationshipStatus, UserRemoveField
 
 __all__ = (
+    # Objects
     "UserStatus",
     "UserProfile",
     "PartialUserBot",
     "Relationship",
     "User",
+
+    # HTTP API
+    "FetchSelfResponse",
+    "EditUserJSON",
+    "EditUserResponse",
+    "FetchUserResponse",
+    "ChangeUsernameJSON",
+    "ChangeUsernameResponse",
+    "FetchUserProfileResponse",
 )
 
 
@@ -93,3 +103,64 @@ class User(TypedDict):
 
     online: NotRequired[Optional[bool]]
     """Whether the user is currently online."""
+
+
+class FetchSelfResponse(User):
+    """Represents the response for :meth:`HTTPHandler.fetch_self` route.
+
+    This is equivalent to :class:`User`.
+    """
+
+
+class EditUserJSON(TypedDict):
+    """Represents the JSON body for :meth:`HTTPHandler.edit_user` route."""
+
+    status: NotRequired[UserStatus]
+    """The payload to change the status."""
+
+    profile: NotRequired[UserProfile]
+    """The payload to change the user profile."""
+
+    avatar: NotRequired[str]
+    """The attachment ID for new avatar."""
+
+    remove: NotRequired[List[UserRemoveField]]
+    """The list of fields to remove from user."""
+
+
+class EditUserResponse(User):
+    """Represents the response for :meth:`HTTPHandler.edit_user` route.
+
+    This is equivalent to :class:`User`.
+    """
+
+
+class FetchUserResponse(User):
+    """Represents the response for :meth:`HTTPHandler.fetch_user` route.
+
+    This is equivalent to :class:`User`.
+    """
+
+
+class ChangeUsernameJSON(TypedDict):
+    """Represents the JSON body for :meth:`HTTPHandler.change_username` route."""
+
+    username: str
+    """The new username"""
+
+    password: str
+    """The current account password."""
+
+
+class ChangeUsernameResponse(User):
+    """Represents the response for :meth:`HTTPHandler.change_username` route.
+
+    This is equivalent to :class:`User`.
+    """
+
+
+class FetchUserProfileResponse(UserProfile):
+    """Represents the response for :meth:`HTTPHandler.fetch_user_profile` route.
+
+    This is equivalent to :class:`UserProfile`.
+    """
