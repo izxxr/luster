@@ -13,8 +13,9 @@ ease of navigation, this section is further divided into sub-sections.
     :maxdepth: 1
 
     client
-    handlers
+    events
     models
     enums
     caching
+    handlers
     types

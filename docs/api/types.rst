@@ -55,6 +55,10 @@ This section documents various enumerations from the Revolt API. All these are t
 
     The status of a relationship.
 
+.. data:: UserRemoveField
+
+    The fields that can be removed from a user object.
+
 
 API Models
 ----------
@@ -143,6 +147,47 @@ QueryNodeResponse
 .. autoclass:: QueryNodeResponse()
     :members:
 
+FetchSelfResponse
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: FetchSelfResponse()
+    :members:
+
+EditUserJSON
+~~~~~~~~~~~~
+
+.. autoclass:: EditUserJSON()
+    :members:
+
+EditUserResponse
+~~~~~~~~~~~~~~~~
+
+.. autoclass:: EditUserResponse()
+    :members:
+
+FetchUserResponse
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: FetchUserResponse()
+    :members:
+
+ChangeUsernameJSON
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChangeUsernameJSON()
+    :members:
+
+ChangeUsernameResponse
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChangeUsernameResponse()
+    :members:
+
+FetchProfileResponse
+~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: FetchProfileResponse()
+    :members:
 
 Websocket Events
 ----------------
