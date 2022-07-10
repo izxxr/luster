@@ -10,6 +10,12 @@ from luster.enums import WebsocketEvent
 if TYPE_CHECKING:
     from luster.types.websocket import EventTypeRecv
 
+__all__ = (
+    "BaseEvent",
+    "Authenticated",
+    "Pong",
+    "Ready",
+)
 
 class BaseEvent(ABC):
     """The base class for all classes relating to websocket events.
@@ -49,3 +55,15 @@ class Pong(BaseEvent):
 
     def get_event_name(self) -> EventTypeRecv:
         return WebsocketEvent.PONG
+
+
+@dataclass
+class Ready(BaseEvent):
+    """An event emitted when client is ready.
+
+    Ready means that client has successfully cached all the entities
+    received from websocket initially.
+    """
+
+    def get_event_name(self) -> EventTypeRecv:
+        return WebsocketEvent.READY

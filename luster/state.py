@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from luster.client import Client
+    from luster.cache import Cache
     from luster.http import HTTPHandler
     from luster.websocket import WebsocketHandler
 
@@ -33,14 +34,23 @@ class State:
         The HTTP handler used for HTTP requests.
     websocket_handler: :class:`WebsocketHandler`
         The websocket handler used for websocket connections.
+    cache: :class:`Cache`
+        The cache handler used for caching entities.
     """
-    def __init__(self, http_handler: HTTPHandler, websocket_handler: WebsocketHandler) -> None:
+    def __init__(
+        self,
+        http_handler: HTTPHandler,
+        websocket_handler: WebsocketHandler,
+        cache: Cache,
+    ) -> None:
         self.__http_handler = http_handler
         self.__websocket_handler = websocket_handler
+        self.__cache = cache
         self.__client: Optional[Client] = None
 
         http_handler.set_state(self)
         websocket_handler.set_state(self)
+        cache.set_state(self)
 
     def set_client(self, client: Client) -> None:
         self.__client = client
@@ -73,3 +83,13 @@ class State:
         :class:`WebsocketHandler`
         """
         return self.__websocket_handler
+
+    @property
+    def cache(self) -> Cache:
+        """The cache handler associated to this state.
+
+        Returns
+        -------
+        :class:`Cache`
+        """
+        return self.__cache

@@ -19,6 +19,9 @@ class WebsocketEvent:
     PONG = "Pong"
     """The pong event is emitted when client pings the websocket."""
 
+    READY = "Ready"
+    """The ready event is emitted when client is ready."""
+
 
 class FileType:
     """An enumeration detailing the values for type of a :class:`File`."""

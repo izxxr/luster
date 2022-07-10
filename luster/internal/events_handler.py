@@ -13,6 +13,7 @@ from typing import (
 )
 from abc import ABC, abstractmethod
 from luster.exceptions import WebsocketError
+from luster.users import User
 from luster import events
 
 import asyncio
@@ -22,8 +23,9 @@ import traceback
 
 
 if TYPE_CHECKING:
-    from luster.events import BaseEvent
     from luster.types.websocket import EventTypeRecv
+    from luster.events import BaseEvent
+    from luster.state import State
     from luster import types
 
 
@@ -196,9 +198,10 @@ def event_handler(event: EventTypeRecv) -> Callable[[Handler], Handler]:
 
 
 class EventsHandler(ListenersMixin):
-    def __init__(self) -> None:
-        self.listeners: Dict[EventTypeRecv, List[Listener[Any]]] = {}
+    def __init__(self, state: State) -> None:
+        self._state = state
         self.__handlers: Dict[EventTypeRecv, Handler] = {}
+        self.listeners: Dict[EventTypeRecv, List[Listener[Any]]] = {}
 
         for _, member in inspect.getmembers(self):
             if hasattr(member, "__luster_event_handler__"):
@@ -236,3 +239,18 @@ class EventsHandler(ListenersMixin):
     async def on_error(self, data: types.ErrorEvent) -> None:
         error = data["error"]
         raise WebsocketError(error)
+
+    @event_handler("Ready")
+    async def on_ready(self, data: types.ReadyEvent) -> None:
+        state = self._state
+        users = data.get("users", [])
+
+        _LOGGER.info("Preparing cache for %r users", len(users))
+
+        for user in users:
+            state.cache.add_user(User(user, state))
+
+        _LOGGER.info("Client is ready.")
+
+        event = events.Ready()
+        self.call_listeners(event)

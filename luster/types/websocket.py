@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 from typing import (
+    Any,
     List,
     TypedDict,
     Literal,
     TYPE_CHECKING,
 )
+from typing_extensions import NotRequired
+
+from luster.types.users import User
 
 if TYPE_CHECKING:
     from luster.types.enums import (
@@ -28,6 +32,7 @@ __all__ = (
     "AuthenticatedEvent",
     "BulkEvent",
     "PongEvent",
+    "ReadyEvent",
 )
 
 class BaseWebsocketEvent(TypedDict):
@@ -108,3 +113,22 @@ class PongEvent(TypedDict):
 
     data: int
     """The data sent during :class:`Ping`."""
+
+
+class ReadyEvent(TypedDict):
+    """Represents an event indicating that client is ready."""
+
+    type: Literal["Ready"]
+    """The type of event."""
+
+    users: List[User]
+    """The list of users the client can see."""
+
+    servers: List[Any]  # TODO: Typehint as Server
+    """The list of servers."""
+
+    channels: List[Any]  # TODO: Typehint as Channel
+    """The list of channels."""
+
+    emojis: NotRequired[List[Any]]  # TODO: Typehint as Emoji
+    """The list of servers."""

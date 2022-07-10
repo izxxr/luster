@@ -16,4 +16,5 @@ ease of navigation, this section is further divided into sub-sections.
     handlers
     models
     enums
+    caching
     types

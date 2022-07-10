@@ -12,6 +12,7 @@ from typing_extensions import Self
 from luster.internal.events_handler import BE, EventsHandler, ListenersMixin, Listener
 from luster.http import create_http_handler, HTTPHandler
 from luster.websocket import WebsocketHandler
+from luster.cache import Cache
 from luster.state import State
 
 import asyncio
@@ -49,9 +50,15 @@ class Client(ListenersMixin):
         be closed automatically after usage. Note that when a session
         is provided by the user, It must be closed by the user. Library
         will not take it's ownership.
-    http_handler_cls: Optional[Type[:class:`HTTPHandler`]]
+    http_handler_cls: Type[:class:`HTTPHandler`]
         The class type of :class:`HTTPHandler`. This can be used
         to set custom subclasses on :attr:`.http_handler`.
+    websocket_handler_cls: Type[:class:`WebsocketHandler`]
+        The class type of :class:`WebsocketHandler`. This can be used
+        to set custom subclasses on :attr:`.websocket_handler`.
+    cache_cls: Type[:class:`Cache`]
+        The class type of :class:`Cache`. This can be used
+        to set custom subclasses on :attr:`.cache`.
     """
 
     def __init__(
@@ -61,12 +68,18 @@ class Client(ListenersMixin):
         session: Optional[ClientSession] = None,
         http_handler_cls: Type[HTTPHandler] = HTTPHandler,
         websocket_handler_cls: Type[WebsocketHandler] = WebsocketHandler,
+        cache_cls: Type[Cache] = Cache,
     ) -> None:
 
         self.__http_handler = create_http_handler(token=token, bot=bot, cls=http_handler_cls, session=session)
         self.__websocket_handler = websocket_handler_cls(http_handler=self.__http_handler)
-        self.__state = State(http_handler=self.__http_handler, websocket_handler=self.__websocket_handler)
-        self.__events_handler = EventsHandler()
+        self.__cache = cache_cls()
+        self.__state = State(
+            http_handler=self.__http_handler,
+            websocket_handler=self.__websocket_handler,
+            cache=self.__cache,
+        )
+        self.__events_handler = EventsHandler(state=self.__state)
         self.__initialized: bool = False
 
         self.__state.set_client(self)
@@ -111,6 +124,16 @@ class Client(ListenersMixin):
         :class:`State`
         """
         return self.__state
+
+    @property
+    def cache(self) -> Cache:
+        """The cache handler associated to this client.
+
+        Returns
+        -------
+        :class:`Cache`
+        """
+        return self.__cache
 
     def listen(self, event: EventTypeRecv) -> Callable[[Listener[BE]], Listener[BE]]:
         """A decorator for registering an event listener.

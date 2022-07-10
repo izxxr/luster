@@ -21,6 +21,15 @@ class StateManagementMixin:
 
     @property
     def state(self) -> Optional[State]:
+        """Returns the state attached to this class.
+
+        This may return ``None`` if no state has been attached
+        to the class yet.
+
+        Returns
+        -------
+        Optional[:class:`State`]
+        """
         return self._state
 
     def set_state(self, state: State) -> None:
