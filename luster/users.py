@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, List, Optional
 from luster.internal.helpers import handle_optional_field
 from luster.internal.mixins import StateAware
 from luster.file import File
+from luster.http import HTTPHandler
 from luster.enums import RelationshipStatus, PresenceType
 
 if TYPE_CHECKING:
@@ -253,6 +254,35 @@ class User(StateAware):
         self.profile = Profile(profile, self) if profile else None
         self.status = Status(status, self) if status else None
         self.bot = PartialUserBot(bot, self) if bot else None
+
+    @property
+    def default_avatar_url(self) -> str:
+        """The URL pointing to user's default avatar.
+
+        This is not user's actual avatar.
+
+        Returns
+        -------
+        :class:`str`
+        """
+        return f"{HTTPHandler.BASE_URL}/users/{self.id}/default_avatar"
+
+    @property
+    def display_avatar_url(self) -> str:
+        """The URL pointing to user's displayed avatar.
+
+        This property is a shorthand that returns the user's
+        actual avatar URL if they have one and falls back to
+        default avatar URL if they don't have a custom avatar.
+
+        Returns
+        -------
+        :class:`str`
+        """
+        avatar = self.avatar
+        if avatar is None:
+            return self.default_avatar_url
+        return avatar.url
 
     def is_bot(self) -> bool:
         """Indicates if the user is a bot.
