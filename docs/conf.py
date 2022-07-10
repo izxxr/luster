@@ -46,6 +46,24 @@ intersphinx_mapping = {
 templates_path = ['_templates']
 html_logo = "assets/logo.png"
 
+# These color options have been copied from Revolt theme.
+html_theme_options = {
+    "light_css_variables": {
+        "color-background-primary": "#ffffff",
+        "color-background-secondary": "#f6f6f6",
+        "color-sidebar-background": "#f1f1f1",
+        "color-brand-primary": "#ff4655",
+        "color-brand-content": "#ff4655",
+    },
+    "dark_css_variables": {
+        "color-background-primary": "#242424",
+        "color-background-secondary": "#181818",
+        "color-sidebar-background": "#1e1e1e",
+        "color-brand-primary": "#ff4655",
+        "color-brand-content": "#ff4655",
+    }
+}
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
