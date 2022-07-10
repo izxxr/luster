@@ -5,11 +5,9 @@ Python library for Revolt.chat API.
 
 > :warning: **Acknowledgement**
 >
-> This library is not yet complete and is currently in it's early development stage.
-> Do not use this for production yet. Expect bugs and other issues. The library is
-> is in active development and will be complete and production ready soon.
+> This library is still under active development and incomplete.
 >
-> Join our [Revolt Server]()
+> Join our [Revolt Server](https://app.revolt.chat/invite/SfzyrsrA) for staying tuned with updates.
 
 ## Features
 - Modern and easy to use interface
