@@ -230,6 +230,9 @@ class User(StateAware):
         self._state = state
         self._update_from_data(data)
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(id={self.id}, username={self.username})"
+
     def _update_from_data(self, data: UserData):
         self.id = data["_id"]
         self.username = data["username"]
@@ -250,6 +253,3 @@ class User(StateAware):
         self.profile = Profile(profile, self) if profile else None
         self.status = Status(status, self) if status else None
         self.bot = PartialUserBot(bot, self) if bot else None
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(id={self.id}, username={self.username})"

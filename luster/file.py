@@ -87,6 +87,9 @@ class File(StateAware):
         self._state = state
         self._update_from_data(data)
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(id={self.id}, filename={self.filename}, content_type={self.content_type}, tag={self.tag})"
+
     def _update_from_data(self, data: FileData):
         self.id = data["_id"]
         self.tag = data["tag"]
