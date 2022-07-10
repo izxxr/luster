@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, List, Optional
 from luster.internal.helpers import handle_optional_field
 from luster.internal.mixins import StateAware
 from luster.file import File
+from luster.enums import RelationshipStatus, PresenceType
 
 if TYPE_CHECKING:
     from luster.state import State
@@ -133,7 +134,7 @@ class Status(StateAware):
 
     def _update_from_data(self, data: UserStatusData):
         self.text = data.get("text")
-        self.presence = handle_optional_field(data, "presence", "Invisible", None)
+        self.presence = handle_optional_field(data, "presence", PresenceType.INVISIBLE, None)
 
 
 class PartialUserBot(StateAware):
@@ -235,7 +236,7 @@ class User(StateAware):
         self.badges = handle_optional_field(data, "badges", 0, None)
         self.flags = handle_optional_field(data, "flags", 0, None)
         self.privileged = data.get("privileged", False)
-        self.relationship = handle_optional_field(data, "relationship", "None", None)
+        self.relationship = handle_optional_field(data, "relationship", RelationshipStatus.NONE, None)
         self.online = handle_optional_field(data, "online", False, None)
 
         avatar = data.get("avatar")
@@ -249,3 +250,6 @@ class User(StateAware):
         self.profile = Profile(profile, self) if profile else None
         self.status = Status(status, self) if status else None
         self.bot = PartialUserBot(bot, self) if bot else None
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(id={self.id}, username={self.username})"
