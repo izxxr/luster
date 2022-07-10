@@ -8,6 +8,7 @@ from luster.internal.mixins import StateAware
 
 if TYPE_CHECKING:
     from luster.state import State
+    from luster.types.enums import FileTag as FileTagRaw
     from luster.types.file import (
         File as FileData,
         FileType as FileTypeRaw,
@@ -25,8 +26,12 @@ class File(StateAware):
     ----------
     id: :class:`str`
         The unique ID of this file.
-    tag: :class:`str`
+    tag: :class:`types.FileTag`
         The tag or bucket that this file has been uploaded to.
+        This attribute can be used to determine whether the file
+        was an attachment, avatar or banner etc.
+
+        .. seealso:: The :class:`FileTag` enum.
     filename: :class:`str`
         The original filename of file.
     content_type: :class:`str`
@@ -56,7 +61,7 @@ class File(StateAware):
 
     if TYPE_CHECKING:
         id: str
-        tag: str
+        tag: FileTagRaw
         filename: str
         content_type: str
         size: int
@@ -118,12 +123,3 @@ class File(StateAware):
         :class:`str`
         """
         return f"https://autumn.revolt.chat/{self.tag}/{self.id}"
-
-    def is_attachment(self) -> bool:
-        """Indicates whether this file is uploaded as a message attachment.
-
-        Parameters
-        ----------
-        :class:`bool`
-        """
-        return self.message_id is not None

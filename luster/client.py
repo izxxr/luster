@@ -14,13 +14,13 @@ from luster.http import create_http_handler, HTTPHandler
 from luster.websocket import WebsocketHandler
 from luster.cache import Cache
 from luster.state import State
+from luster.users import User
 
 import asyncio
 
 if TYPE_CHECKING:
     from aiohttp import ClientSession
-    from luster.types.websocket import EventTypeRecv
-
+    from luster import types
 
 __all__ = (
     "Client",
@@ -135,12 +135,12 @@ class Client(ListenersMixin):
         """
         return self.__cache
 
-    def listen(self, event: EventTypeRecv) -> Callable[[Listener[BE]], Listener[BE]]:
+    def listen(self, event: types.EventTypeRecv) -> Callable[[Listener[BE]], Listener[BE]]:
         """A decorator for registering an event listener.
 
         Parameters
         ----------
-        event: :class:`types.EventTypeRecv`
+        event: :class:`types.types.EventTypeRecv`
             The event to listen to.
         """
         def __wrap(func: Listener[BE]) -> Listener[BE]:
@@ -190,3 +190,75 @@ class Client(ListenersMixin):
             asyncio.run(runner())
         except KeyboardInterrupt:
             pass
+
+    async def fetch_self(self) -> User:
+        """Fetches the user for current client.
+
+        Returns
+        -------
+        :class:`User`
+            The user for current client.
+
+        Raises
+        ------
+        HTTPException
+            Fetching the user failed.
+        """
+        data = await self.__http_handler.fetch_self()
+        return User(data, self.__state)
+
+    async def fetch_user(self, user_id: str) -> User:
+        """Fetches the user by their ID.
+
+        Parameters
+        ----------
+        user_id: :class:`str`
+            The ID of user.
+
+        Returns
+        -------
+        :class:`User`
+            The requested user.
+
+        Raises
+        ------
+        HTTPNotFound
+            User does not exist.
+        HTTPException
+            The request failed.
+        """
+        data = await self.__http_handler.fetch_user(user_id)
+        return User(data, self.__state)
+
+    async def change_username(self, username: str, password: str) -> User:
+        """Changes the username of current user.
+
+        .. note::
+
+            This can only be used by non-bot accounts.
+
+        Parameters
+        ----------
+        username: :class:`str`
+            The new username.
+        password: :class:`str`
+            The current account password.
+
+        Returns
+        -------
+        :class:`User`
+            The updated user.
+
+        Raises
+        ------
+        HTTPException
+            The request failed.
+        HTTPForbidden
+            The credentials are incorrect.
+        """
+        json: types.ChangeUsernameJSON = {
+            "username": username,
+            "password": password,
+        }
+        data = await self.__http_handler.change_username(json)
+        return User(data, self.__state)

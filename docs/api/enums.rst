@@ -14,6 +14,12 @@ WebsocketEvent
 .. autoclass:: WebsocketEvent
     :members:
 
+FileTag
+-------
+
+.. autoclass:: FileTag
+    :members:
+
 FileType
 --------
 

@@ -47,6 +47,10 @@ This section documents various enumerations from the Revolt API. All these are t
 
     The types of file.
 
+.. data:: FileTag
+
+    The tags or buckets that a file can be uploaded to.
+
 .. data:: PresenceType
 
     The presence states of a user.
@@ -188,6 +192,13 @@ FetchProfileResponse
 
 .. autoclass:: FetchProfileResponse()
     :members:
+
+UploadFileResponse
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: UploadFileResponse()
+    :members:
+
 
 Websocket Events
 ----------------

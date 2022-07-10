@@ -13,6 +13,7 @@ __all__ = (
     "WebsocketVersion",
     "WebsocketFormat",
     "FileType",
+    "FileTag",
     "PresenceType",
     "RelationshipStatus",
     "UserRemoveField",
@@ -35,6 +36,7 @@ WebsocketFormat = Literal["msgpack", "json"]
 
 # File
 FileType = Literal["File"]
+FileTag = Literal["attachments", "avatars", "banners", "icons", "emojis", "backgrounds"]
 
 # Users
 PresenceType = Literal["Online", "Idle", "Busy", "Invisible"]

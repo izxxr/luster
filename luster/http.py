@@ -24,11 +24,13 @@ from luster.exceptions import (
     HTTPServerError,
 )
 
+import io
 import aiohttp
 import luster
 
 if TYPE_CHECKING:
     from luster import types
+
 
 __all__ = (
     "HTTPHandler",
@@ -168,6 +170,9 @@ class HTTPHandler(StateManagementMixin):
     BASE_URL: ClassVar[str] = "https://api.revolt.chat"
     """The base URL used for routes."""
 
+    AUTUMN_BASE_URL: ClassVar[str] = "https://autumn.revolt.chat"
+    """The base URL for Autumn file service."""
+
     def __init__(
         self,
         *,
@@ -271,7 +276,7 @@ class HTTPHandler(StateManagementMixin):
             return response.json()
         return response.text()
 
-    async def request(self, method: str, route: str, **kwargs: Any) -> Any:
+    async def request(self, method: str, route: str, base_url: Optional[str] = None, **kwargs: Any) -> Any:
         """Requests a certain route and returns the response data.
 
         Parameters
@@ -280,6 +285,8 @@ class HTTPHandler(StateManagementMixin):
             The HTTP method to use.
         route: :class:`str`
             The route that will be appended to :attr:`.BASE_URL`.
+        base_url: :class:`str`
+            Override the base URL per request. Defaults to :attr:`.BASE_URL`.
         **kwargs:
             The keyword arguments that are passed to :meth:`aiohttp.ClientSession.request`.
             It is worth noting that provided headers will be updated to include the proper
@@ -302,7 +309,10 @@ class HTTPHandler(StateManagementMixin):
         }
         headers.update(to_update)
 
-        url = f"{self.BASE_URL}{route}"
+        if base_url is None:
+            base_url = self.BASE_URL
+
+        url = f"{base_url}{route}"
         session = self.__session
 
         async with session.request(method, url, headers=headers, **kwargs) as response:  # type: ignore
@@ -323,6 +333,29 @@ class HTTPHandler(StateManagementMixin):
                 raise HTTPServerError(response, data)
 
             raise HTTPException(response, data)
+
+    async def upload_file(self, file: io.BufferedReader, tag: types.FileTag) -> types.UploadFileResponse:
+        """Uploads a file to Autumn file server.
+
+        Parameters
+        ----------
+        target: :class:`io.BufferedReader`
+            The file buffer to upload.
+        tag: :class:`types.FileTag`
+            The tag or bucket to upload this file to.
+        """
+        if not file.readable():
+            raise RuntimeError("Asset must be readable")
+
+        data = aiohttp.FormData()
+        data.add_field(
+            name="file",
+            value=file.read(),
+            filename=file.name,
+            content_type="application/octet-stream",
+        )
+        data = await self.request("POST", f"/{tag}", base_url=self.AUTUMN_BASE_URL, data=data)
+        return data
 
     # Node Info
 
@@ -398,7 +431,7 @@ class HTTPHandler(StateManagementMixin):
         data = await self.request("PATCH", "/users/@me/username", json=json)
         return data
 
-    async def fetch_profile(self, user_id: int) -> types.FetchProfileResponse:
+    async def fetch_profile(self, user_id: str) -> types.FetchProfileResponse:
         """Fetch a user's profile.
 
         Parameters
@@ -410,5 +443,5 @@ class HTTPHandler(StateManagementMixin):
         -------
         :class:`types.FetchProfileResponse`
         """
-        data = await self.request("GET", "/users/@me/profile")
+        data = await self.request("GET", f"/users/{user_id}/profile")
         return data

@@ -7,6 +7,7 @@ __all__ = (
     "FileType",
     "RelationshipStatus",
     "PresenceType",
+    "FileTag",
 )
 
 
@@ -69,3 +70,25 @@ class PresenceType:
 
     INVISIBLE = "Invisible"
     """The user is offline."""
+
+
+class FileTag:
+    """An enumeration detailing values for tag of :class:`File`."""
+
+    ATTACHMENTS = "attachments"
+    """The file is an attachment."""
+
+    AVATARS = "avatars"
+    """The file is an avatar."""
+
+    BACKGROUNDS = "backgrounds"
+    """The file is a profile background."""
+
+    BANNERS = "banners"
+    """The file is a banner."""
+
+    EMOJIS = "emojis"
+    """The file is an emoji."""
+
+    ICONS = "icons"
+    """The file is an icon."""

@@ -69,6 +69,16 @@ html_theme_options = {
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+_attachment_parameter_note = (
+    "If a :class:`str` is passed, It is considered the attachment ID and is passed directly. "
+    "If a :class:`io.BufferedReader` is passed, It will be automatically uploaded to file server "
+    "first using :meth:`HTTPHandler.upload_file`"
+)
+
+rst_prolog = f"""
+.. |attachment-parameter-note| replace:: {_attachment_parameter_note}
+"""
+
 
 # -- Options for HTML output -------------------------------------------------
 

@@ -2,14 +2,21 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional
-from luster.internal.helpers import handle_optional_field
+from typing import TYPE_CHECKING, List, Optional, Union
+from luster.internal.helpers import (
+    MISSING,
+    handle_optional_field,
+    inner_upsert,
+    upsert_remove_value,
+    get_attachment_id,
+)
 from luster.internal.mixins import StateAware
 from luster.file import File
 from luster.http import HTTPHandler
 from luster.enums import RelationshipStatus, PresenceType
 
 if TYPE_CHECKING:
+    from io import BufferedReader
     from luster.state import State
     from luster.types.users import (
         User as UserData,
@@ -292,3 +299,106 @@ class User(StateAware):
         :class:`bool`
         """
         return self.bot is not None
+
+    async def fetch_profile(self) -> Profile:
+        """Fetches the profile of this user.
+
+        Returns
+        -------
+        :class:`Profile`
+            The user's profile
+
+        Raises
+        ------
+        HTTPException
+            The request failed.
+        HTTPNotFound
+            You are not allowed to fetch this user's profile.
+        """
+        data = await self._state.http_handler.fetch_profile(self.id)
+        return Profile(data, self)
+
+    async def edit(
+        self,
+        *,
+        status_text: Optional[str] = MISSING,
+        status_presence: Optional[RawPresenceType] = MISSING,
+        profile_content: Optional[str] = MISSING,
+        profile_background: Optional[Union[str, BufferedReader]] = MISSING,
+        avatar: Optional[Union[str, BufferedReader]] = MISSING,
+    ) -> User:
+        """Edits the user.
+
+        This method requires the user to be the current authenticated
+        user. Otherwise, This method will fail.
+
+        Passing ``None`` to the parameters hinted as :class:`typing.Optional`
+        will remove that field.
+
+        Parameters
+        ----------
+        status_text: Optional[:class:`str`]
+            The user's custom status.
+        status_presence: Optional[:class:`types.PresenceType`]
+            The user's presence type.
+
+            .. seealso:: The :class:`PresenceType` enum.
+        profile_content: Optional[:class:`str`]
+            The content of profile "aka" the bio section.
+        profile_background: Optional[Union[:class:`str`, :class:`io.BufferedReader`]]
+            The profile background of the user.
+            |attachment-parameter-note|
+        avatar: Optional[Union[:class:`str`, :class:`io.BufferedReader`]]
+            The avatar of the user.
+            |attachment-parameter-note|
+
+        Returns
+        -------
+        :class:`User`
+            The updated user.
+
+        Raises
+        ------
+        HTTPException
+            Failed to edit the user.
+        """
+        json = {}
+
+        if status_text is not MISSING:
+            if status_text is None:
+                upsert_remove_value(json, "StatusText")
+            else:
+                inner_upsert(json, "status", "text", status_text)
+
+        if status_presence is not MISSING:
+            if status_presence is None:
+                upsert_remove_value(json, "StatusPresence")
+            else:
+                inner_upsert(json, "status", "presence", status_presence)
+
+        if profile_content is not MISSING:
+            if profile_content is None:
+                upsert_remove_value(json, "ProfileContent")
+            else:
+                inner_upsert(json, "profile", "content", profile_content)
+
+        state = self._state
+        http = state.http_handler
+
+        if profile_background is not MISSING:
+            if profile_background is None:
+                upsert_remove_value(json, "ProfileBackground")
+            else:
+                attachment_id = await get_attachment_id(http=http, target=profile_background, tag="backgrounds")
+                inner_upsert(json, "profile", "background", attachment_id)
+
+        if avatar is not MISSING:
+            if avatar is None:
+                upsert_remove_value(json, "Avatar")
+            else:
+                json["avatar"] = await get_attachment_id(http=http, target=avatar, tag="avatars")
+
+
+        # json is now equivalent to types.EditUser
+        data = await http.edit_user(json)  # type: ignore
+        return User(data, state)

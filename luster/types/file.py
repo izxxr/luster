@@ -6,12 +6,13 @@ from typing import TYPE_CHECKING, Optional, TypedDict
 from typing_extensions import NotRequired
 
 if TYPE_CHECKING:
-    from luster.types.enums import FileType
+    from luster.types.enums import FileType, FileTag
 
 
 __all__ = (
     "FileMetadata",
     "File",
+    "UploadFileResponse",
 )
 
 
@@ -28,7 +29,7 @@ class File(TypedDict):
     _id: str
     """The unique ID of file."""
 
-    tag: str
+    tag: FileTag
     """The tag or bucket that the file was uploaded to."""
 
     filename: str
@@ -60,3 +61,10 @@ class File(TypedDict):
 
     object_id: NotRequired[Optional[str]]
     """The ID of object associated to this file such as a user."""
+
+
+class UploadFileResponse(TypedDict):
+    """Represents the response of :meth:`HTTPHandler.upload_file`."""
+    
+    id: str
+    """The ID of uploaded file."""
