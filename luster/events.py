@@ -30,7 +30,7 @@ class BaseEvent(ABC):
 
         Returns
         -------
-        :class:`types.EventTypeRecv`
+        :class:`luster.types.EventTypeRecv`
         """
 
 

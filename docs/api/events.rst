@@ -36,7 +36,7 @@ this parameter will take different class all inheriting a common base class, :cl
 .. note::
 
     For users manually using the :class:`luster.WebsocketHandler`, There is no event
-    listeners API available in this class. They can override :meth:`WebsocketHandler.on_websocket_event`
+    listeners API available in this class. They can override :meth:`luster.WebsocketHandler.on_websocket_event`
     hook to receive events and handle them manually.
 
 
