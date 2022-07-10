@@ -104,16 +104,16 @@ User
 .. autoclass:: User()
     :members:
 
-UserStatus
+Status
 ~~~~~~~~~~
 
-.. autoclass:: UserStatus()
+.. autoclass:: Status()
     :members:
 
-UserProfile
+Profile
 ~~~~~~~~~~~
 
-.. autoclass:: UserProfile()
+.. autoclass:: Profile()
     :members:
 
 

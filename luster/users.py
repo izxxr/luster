@@ -14,8 +14,8 @@ if TYPE_CHECKING:
     from luster.types.users import (
         User as UserData,
         Relationship as RelationshipData,
-        UserProfile as UserProfileData,
-        UserStatus as UserStatusData,
+        Profile as ProfileData,
+        Status as StatusData,
         PartialUserBot as PartialUserBotData,
     )
     from luster.types.enums import (
@@ -91,12 +91,12 @@ class Profile(StateAware):
         "background",
     )
 
-    def __init__(self, data: UserProfileData, user: User) -> None:
+    def __init__(self, data: ProfileData, user: User) -> None:
         self.user = user
         self._state = user.state
         self._update_from_data(data)
 
-    def _update_from_data(self, data: UserProfileData):
+    def _update_from_data(self, data: ProfileData):
         self.content = data.get("content")
 
         background = data.get("background")
@@ -128,12 +128,12 @@ class Status(StateAware):
         "presence",
     )
 
-    def __init__(self, data: UserStatusData, user: User) -> None:
+    def __init__(self, data: StatusData, user: User) -> None:
         self.user = user
         self._state = user.state
         self._update_from_data(data)
 
-    def _update_from_data(self, data: UserStatusData):
+    def _update_from_data(self, data: StatusData):
         self.text = data.get("text")
         self.presence = handle_optional_field(data, "presence", PresenceType.INVISIBLE, None)
 

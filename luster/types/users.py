@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 
 __all__ = (
     # Objects
-    "UserStatus",
-    "UserProfile",
+    "Status",
+    "Profile",
     "PartialUserBot",
     "Relationship",
     "User",
@@ -24,11 +24,11 @@ __all__ = (
     "FetchUserResponse",
     "ChangeUsernameJSON",
     "ChangeUsernameResponse",
-    "FetchUserProfileResponse",
+    "FetchProfileResponse",
 )
 
 
-class UserStatus(TypedDict):
+class Status(TypedDict):
     """Represents the status of a user."""
 
     text: NotRequired[Optional[str]]
@@ -38,7 +38,7 @@ class UserStatus(TypedDict):
     """The current presence state of the user."""
 
 
-class UserProfile(TypedDict):
+class Profile(TypedDict):
     """Represents the profile of a user."""
 
     content: NotRequired[Optional[str]]
@@ -83,10 +83,10 @@ class User(TypedDict):
     badges: NotRequired[Optional[int]]
     """The bitfield value for user profile badges."""
 
-    status: NotRequired[Optional[UserStatus]]
+    status: NotRequired[Optional[Status]]
     """The user's current activity status."""
 
-    profile: NotRequired[Optional[UserProfile]]
+    profile: NotRequired[Optional[Profile]]
     """The user's profile."""
 
     flags: NotRequired[Optional[int]]
@@ -115,10 +115,10 @@ class FetchSelfResponse(User):
 class EditUserJSON(TypedDict):
     """Represents the JSON body for :meth:`HTTPHandler.edit_user` route."""
 
-    status: NotRequired[UserStatus]
+    status: NotRequired[Status]
     """The payload to change the status."""
 
-    profile: NotRequired[UserProfile]
+    profile: NotRequired[Profile]
     """The payload to change the user profile."""
 
     avatar: NotRequired[str]
@@ -159,8 +159,8 @@ class ChangeUsernameResponse(User):
     """
 
 
-class FetchUserProfileResponse(UserProfile):
-    """Represents the response for :meth:`HTTPHandler.fetch_user_profile` route.
+class FetchProfileResponse(Profile):
+    """Represents the response for :meth:`HTTPHandler.fetch_profile` route.
 
-    This is equivalent to :class:`UserProfile`.
+    This is equivalent to :class:`Profile`.
     """
