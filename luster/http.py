@@ -398,7 +398,7 @@ class HTTPHandler(StateManagementMixin):
         data = await self.request("PATCH", "/users/@me/username", json=json)
         return data
 
-    async def fetch_profile(self, user_id: int) -> types.FetchUserProfileResponse:
+    async def fetch_user_profile(self, user_id: int) -> types.FetchUserProfileResponse:
         """Fetch a user's profile.
 
         Parameters
