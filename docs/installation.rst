@@ -28,3 +28,8 @@ Following are the optional dependencies for performance optimizations:
 - `msgpack <https://pypi.org/project/msgpack>`_ — Faster websocket packets parsing.
 - `ujson <https://pypi.org/project/ujson>`_ — Faster JSON parsing.
 - `aiohttp[speed] <https://docs.aiohttp.org/en/stable/#installing-speedups-altogether>`_ — aiohttp speed-ups.
+
+All these optional dependencies can be installed easily by providing the ``speed`` scope in the
+pip command above::
+
+    $ pip install luster[speed]
