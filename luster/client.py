@@ -96,6 +96,16 @@ class Client(ListenersMixin):
         return self.__events_handler
 
     @property
+    def closed(self) -> bool:
+        """Whether the client's websocket connection is currently closed.
+
+        Returns
+        -------
+        :class:`bool`
+        """
+        return self.__websocket_handler.closed
+
+    @property
     def http_handler(self) -> HTTPHandler:
         """The HTTP handler associated to this client.
 
@@ -160,7 +170,21 @@ class Client(ListenersMixin):
             return
 
         await self.__http_handler.close()
+        await self.__websocket_handler.close()
+
         self.__initialized = False
+        await self.close_hook()
+
+    async def close_hook(self) -> None:
+        """A hook that gets called when client has fully closed.
+
+        :attr:`.closed` property will always return ``True``
+        in this hook.
+
+        You can use this hook to perform extra clean up on client
+        closure such as closing database connections etc.
+        """
+        pass
 
     async def connect(self) -> None:
         """Connects the client to Revolt websocket."""

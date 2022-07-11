@@ -131,6 +131,7 @@ dmypy.json
 # Misc.
 .misc/
 test.*
+tests_common/
 
 # VSCode Settings
 # We only want to consider settings.json that includes type checker
