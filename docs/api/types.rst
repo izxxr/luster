@@ -138,6 +138,38 @@ Relationship
 .. autoclass:: Relationship()
     :members:
 
+Server
+~~~~~~
+
+.. autoclass:: Server()
+    :members:
+
+
+SystemMessages
+~~~~~~~~~~~~~~
+
+.. autoclass:: SystemMessages()
+    :members:
+
+Category
+~~~~~~~~
+
+.. autoclass:: Category()
+    :members:
+
+Role
+~~~~
+
+.. autoclass:: Role()
+    :members:
+
+
+Permissions
+~~~~~~~~~~~
+
+.. autoclass:: Permissions()
+    :members:
+
 
 HTTP Routes
 -----------
