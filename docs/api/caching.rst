@@ -18,6 +18,8 @@ Cache
 .. autoclass:: Cache
     :members:
 
+.. _api-caching-custom-handler:
+
 Custom Cache Handler
 --------------------
 

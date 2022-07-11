@@ -28,6 +28,7 @@ Python library for Revolt.chat API.
 
    installation
    api/index
+   faq
    contributing
    releases
 
