@@ -339,10 +339,15 @@ class HTTPHandler(StateManagementMixin):
 
         Parameters
         ----------
-        target: :class:`io.BufferedReader`
+        file: :class:`io.BufferedReader`
             The file buffer to upload.
         tag: :class:`types.FileTag`
             The tag or bucket to upload this file to.
+
+        Returns
+        -------
+        :class:`types.UploadFileResponse`
+            The uploaded file.
         """
         if not file.readable():
             raise RuntimeError("Asset must be readable")

@@ -8,15 +8,43 @@ from luster.internal.mixins import StateAware
 
 if TYPE_CHECKING:
     from luster.state import State
-    from luster.types.enums import FileTag as FileTagRaw
-    from luster.types.file import (
-        File as FileData,
-        FileType as FileTypeRaw,
-    )
+    from luster import types
 
 __all__ = (
     "File",
+    "PartialUploadedFile",
 )
+
+
+class PartialUploadedFile(StateAware):
+    """Represents an uploaded file.
+
+    This is a partial model that only includes the uploaded
+    file's ID and tag/bucket.
+
+    This model is generally returned by :meth:`Client.upload_file`.
+
+    Attributes
+    ----------
+    id: :class:`str`
+        The file's ID.
+    tag: :class:`types.FileTag`
+        The bucket that this file was uploaded to.
+    """
+    if TYPE_CHECKING:
+        tag: types.FileTag
+        id: str
+
+    __slots__ = (
+        "_state",
+        "tag",
+        "id",
+    )
+
+    def __init__(self, data: types.UploadFileResponse, tag: types.FileTag, state: State) -> None:
+        self._state = state
+        self.tag = tag
+        self.id = data["id"]
 
 
 class File(StateAware):
@@ -61,11 +89,11 @@ class File(StateAware):
 
     if TYPE_CHECKING:
         id: str
-        tag: FileTagRaw
+        tag: types.FileTag
         filename: str
         content_type: str
         size: int
-        type: FileTypeRaw
+        type: types.FileType
         deleted: bool
         reported: bool
         message_id: Optional[str]
@@ -88,14 +116,14 @@ class File(StateAware):
         "object_id",
     )
 
-    def __init__(self, data: FileData, state: State) -> None:
+    def __init__(self, data: types.File, state: State) -> None:
         self._state = state
         self._update_from_data(data)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(id={self.id!r}, filename={self.filename!r}, content_type={self.content_type!r}, tag={self.tag!r})"
 
-    def _update_from_data(self, data: FileData):
+    def _update_from_data(self, data: types.File):
         self.id = data["_id"]
         self.tag = data["tag"]
         self.filename = data["filename"]
@@ -110,7 +138,7 @@ class File(StateAware):
 
         self._unroll_metadata(data)
 
-    def _unroll_metadata(self, data: FileData):
+    def _unroll_metadata(self, data: types.File):
         metadata = data["metadata"]
         self.type = metadata["type"]
 

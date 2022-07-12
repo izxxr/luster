@@ -15,12 +15,14 @@ from luster.websocket import WebsocketHandler
 from luster.cache import Cache
 from luster.state import State
 from luster.users import User
+from luster.file import PartialUploadedFile
 
 import asyncio
 
 if TYPE_CHECKING:
     from aiohttp import ClientSession
     from luster import types
+    from io import BufferedReader
 
 __all__ = (
     "Client",
@@ -214,6 +216,24 @@ class Client(ListenersMixin):
             asyncio.run(runner())
         except KeyboardInterrupt:
             pass
+
+    async def upload_file(self, file: BufferedReader, tag: types.FileTag) -> PartialUploadedFile:
+        """Uploads a file to Autumn file server.
+
+        Parameters
+        ----------
+        file: :class:`io.BufferedReader`
+            The file buffer to upload.
+        tag: :class:`types.FileTag`
+            The tag or bucket to upload this file to.
+
+        Returns
+        -------
+        :class:`PartialUploadedFile`
+            The uploaded file.
+        """
+        data = await self.__http_handler.upload_file(file, tag)
+        return PartialUploadedFile(data, tag, self.__state)
 
     async def fetch_self(self) -> User:
         """Fetches the user for current client.
