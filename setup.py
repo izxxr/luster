@@ -1,7 +1,7 @@
 from setuptools import setup
 
 
-VERSION = "0.1.0a2"
+VERSION = "0.1.0a3"
 GITHUB = "https://github.com/nerdguyahmad/luster"
 DOCUMENTATION = "https://luster.readthedocs.io"
 LICENSE = "MIT"
