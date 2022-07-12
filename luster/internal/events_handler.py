@@ -13,7 +13,7 @@ from typing import (
 )
 from abc import ABC, abstractmethod
 from luster.exceptions import WebsocketError
-from luster.users import User
+from luster.users import User, Relationship
 from luster import events
 
 import asyncio
@@ -263,7 +263,7 @@ class EventsHandler(ListenersMixin):
         user = state.cache.get_user(user_id)
 
         if user is None:
-            _LOGGER.debug("(Event: UserUpdate) User %r is not cached.")
+            _LOGGER.debug("(Event: UserUpdate) User %r is not cached.", user_id)
             return
 
         before = copy.copy(user)
@@ -275,4 +275,26 @@ class EventsHandler(ListenersMixin):
         user.update(update_data)
 
         event = events.UserUpdate(before=before, after=user)
+        self.call_listeners(event)
+
+    @event_handler("UserRelationship")
+    async def on_user_relationship(self, data: types.UserRelationshipEvent) -> None:
+        state = self._state
+
+        # This user object represents the user *before* the
+        # relationship update happened so we need to convert
+        # it to updated user
+        user_data = data["user"]
+        user = User(user_data, state)
+
+        before_user = copy.copy(user)
+
+        # Change the user object to be updated
+        user.relationship = data["status"]
+        state.cache.add_user(user)
+
+        before = Relationship({"_id": user.id, "status": before_user.relationship}, before_user)  # type: ignore
+        after = Relationship({"_id": user.id, "status": data["status"]}, user)  # type: ignore
+
+        event = events.UserRelationship(before=before, after=after)
         self.call_listeners(event)

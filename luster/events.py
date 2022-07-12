@@ -8,8 +8,8 @@ from dataclasses import dataclass
 from luster.enums import WebsocketEvent
 
 if TYPE_CHECKING:
-    from luster.types.websocket import EventTypeRecv
-    from luster.users import User
+    from luster import types
+    from luster.users import User, Relationship
 
 __all__ = (
     "BaseEvent",
@@ -17,6 +17,8 @@ __all__ = (
     "Pong",
     "Ready",
     "UserUpdate",
+    "UserRelationship",
+    "UserRelationshipUpdate",
 )
 
 
@@ -28,7 +30,7 @@ class BaseEvent(ABC):
     """
 
     @abstractmethod
-    def get_event_name(self) -> EventTypeRecv:
+    def get_event_name(self) -> types.EventTypeRecv:
         """Gets the name of event.
 
         Returns
@@ -45,7 +47,7 @@ class Authenticated(BaseEvent):
     initiated the websocket session and is now ready for receiving data
     over websocket.
     """
-    def get_event_name(self) -> EventTypeRecv:
+    def get_event_name(self) -> types.EventTypeRecv:
         return WebsocketEvent.AUTHENTICATED
 
 
@@ -56,7 +58,7 @@ class Pong(BaseEvent):
     data: Any
     """The data sent during the ping event."""
 
-    def get_event_name(self) -> EventTypeRecv:
+    def get_event_name(self) -> types.EventTypeRecv:
         return WebsocketEvent.PONG
 
 
@@ -68,7 +70,7 @@ class Ready(BaseEvent):
     received from websocket initially.
     """
 
-    def get_event_name(self) -> EventTypeRecv:
+    def get_event_name(self) -> types.EventTypeRecv:
         return WebsocketEvent.READY
 
 
@@ -82,5 +84,27 @@ class UserUpdate(BaseEvent):
     after: User
     """The user after the update."""
 
-    def get_event_name(self) -> EventTypeRecv:
+    def get_event_name(self) -> types.EventTypeRecv:
         return WebsocketEvent.USER_UPDATE
+
+@dataclass
+class UserRelationship(BaseEvent):
+    """An event emitted when your relationship with another user is updated."""
+
+    before: Relationship
+    """The relationship before the update."""
+
+    after: Relationship
+    """The relationship after the update."""
+
+    def get_event_name(self) -> types.EventTypeRecv:
+        return WebsocketEvent.USER_RELATIONSHIP
+
+    @property
+    def user(self) -> User:
+        """The user with which the relationship was updated."""
+        return self.after.user
+
+
+UserRelationshipUpdate = UserRelationship
+"""An alias for :class:`UserRelationship`."""

@@ -304,3 +304,9 @@ UserUpdateEventData
 
 .. autoclass:: UserUpdateEventData()
     :members:
+
+UserRelationshipEvent
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: UserRelationshipEvent()
+    :members:

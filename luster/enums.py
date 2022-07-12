@@ -26,6 +26,12 @@ class WebsocketEvent:
     USER_UPDATE = "UserUpdate"
     """This event is emitted when a user is updated."""
 
+    USER_RELATIONSHIP = "UserRelationship"
+    """This event is emitted when your relationship with a user updates."""
+
+    USER_RELATIONSHIP_UPDATE = USER_RELATIONSHIP
+    """An alias for :attr:`.USER_RELATIONSHIP`."""
+
 
 class FileType:
     """An enumeration detailing the values for type of a :class:`File`."""

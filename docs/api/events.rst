@@ -75,3 +75,15 @@ UserUpdate
 
 .. autoclass:: UserUpdate
     :members:
+
+UserRelationship
+~~~~~~~~~~~~~~~~
+
+.. autoclass:: UserRelationship
+    :members:
+
+UserRelationshipUpdate
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: UserRelationshipUpdate
+    :members:

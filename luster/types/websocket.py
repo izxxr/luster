@@ -20,6 +20,7 @@ if TYPE_CHECKING:
         EventTypeRecv,
         ErrorId,
         UserRemoveField,
+        RelationshipStatus
     )
 
 
@@ -38,6 +39,7 @@ __all__ = (
     "ReadyEvent",
     "UserUpdateEvent",
     "UserUpdateEventData",
+    "UserRelationshipEvent",
 )
 
 class BaseWebsocketEvent(TypedDict):
@@ -185,3 +187,22 @@ class UserUpdateEvent(TypedDict):
 
     data: UserUpdateEventData
     """The fields that were updated."""
+
+class UserRelationshipEvent(TypedDict):
+    """Represents an event indicating update of relationship with another user."""
+
+    type: Literal["UserRelationship"]
+    """The type of event."""
+
+    id: str
+    """The ID of your user."""
+
+    user: User
+    """The user with which relationship has changed.
+
+    This user object represents the user before the relationship
+    status has been updated.
+    """
+
+    status: RelationshipStatus
+    """The new relationship status."""
