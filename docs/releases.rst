@@ -15,19 +15,22 @@ Additions
 
 - Add :meth:`Client.close_hook` hook and :attr:`Client.closed` property to allow tracking client's closures.
 - Add support for proper state handling.
-  - Add :class:`State` class.
-  - Handlers and :class:`Client` now has a :attr:`~Client.state` attribute.
+    - Add :class:`State` class.
+    - Handlers and :class:`Client` now has a :attr:`~Client.state` attribute.
+
 - Add support for caching.
-  - Add :class:`Cache` class.
-  - Add :class:`Client.cache` attribute.
+    - Add :class:`Cache` class.
+    - Add :class:`Client.cache` attribute.
+
 - Add support for files.
-  - Add :func:`HTTPHandler.upload_file` to allow uploading files.
-  - Add :func:`Client.upload_file` to allow uploading files.
+    - Add :func:`HTTPHandler.upload_file` to allow uploading files.
+    - Add :func:`Client.upload_file` to allow uploading files.
+
 - Add support for users.
-  - Add API types for users.
-  - Add HTTP methods for users in :class:`HTTPHandler`.
-  - Add :class:`User`, :class:`Profile`, :class:`Status`, :class:`PartialUserBot` and :class:`Relationship` classes.
-  - Add :class:`events.UserUpdate` and :class:`events.UserRelationship` events.
+    - Add API types for users.
+    - Add HTTP methods for users in :class:`HTTPHandler`.
+    - Add :class:`User`, :class:`Profile`, :class:`Status`, :class:`PartialUserBot` and :class:`Relationship` classes.
+    - Add :class:`events.UserUpdate` and :class:`events.UserRelationship` events.
 
 Documentation Changes
 ~~~~~~~~~~~~~~~~~~~~~
