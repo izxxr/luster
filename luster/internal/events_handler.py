@@ -17,6 +17,7 @@ from luster.users import User
 from luster import events
 
 import asyncio
+import copy
 import inspect
 import logging
 import traceback
@@ -253,4 +254,25 @@ class EventsHandler(ListenersMixin):
         _LOGGER.info("Client is ready.")
 
         event = events.Ready()
+        self.call_listeners(event)
+
+    @event_handler("UserUpdate")
+    async def on_user_update(self, data: types.UserUpdateEvent) -> None:
+        state = self._state
+        user_id = data["id"]
+        user = state.cache.get_user(user_id)
+
+        if user is None:
+            _LOGGER.debug("(Event: UserUpdate) User %r is not cached.")
+            return
+
+        before = copy.copy(user)
+
+        fields = data.get("clear", [])
+        update_data = data.get("data", {})
+
+        user.handle_field_removals(fields)
+        user.update(update_data)
+
+        event = events.UserUpdate(before=before, after=user)
         self.call_listeners(event)

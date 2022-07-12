@@ -23,6 +23,9 @@ class WebsocketEvent:
     READY = "Ready"
     """The ready event is emitted when client is ready."""
 
+    USER_UPDATE = "UserUpdate"
+    """This event is emitted when a user is updated."""
+
 
 class FileType:
     """An enumeration detailing the values for type of a :class:`File`."""

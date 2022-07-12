@@ -9,13 +9,16 @@ from luster.enums import WebsocketEvent
 
 if TYPE_CHECKING:
     from luster.types.websocket import EventTypeRecv
+    from luster.users import User
 
 __all__ = (
     "BaseEvent",
     "Authenticated",
     "Pong",
     "Ready",
+    "UserUpdate",
 )
+
 
 class BaseEvent(ABC):
     """The base class for all classes relating to websocket events.
@@ -67,3 +70,17 @@ class Ready(BaseEvent):
 
     def get_event_name(self) -> EventTypeRecv:
         return WebsocketEvent.READY
+
+
+@dataclass
+class UserUpdate(BaseEvent):
+    """An event emitted when ownself or another user is updated."""
+
+    before: User
+    """The user before the update."""
+
+    after: User
+    """The user after the update."""
+
+    def get_event_name(self) -> EventTypeRecv:
+        return WebsocketEvent.USER_UPDATE

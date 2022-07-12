@@ -11,6 +11,8 @@ from luster.internal.helpers import (
     get_attachment_id,
 )
 from luster.internal.mixins import StateAware
+from luster.internal.update_handler import UpdateHandler, handle_update
+from luster.types.websocket import UserUpdateEventData
 from luster.file import File
 from luster.http import HTTPHandler
 from luster.enums import RelationshipStatus, PresenceType
@@ -18,17 +20,7 @@ from luster.enums import RelationshipStatus, PresenceType
 if TYPE_CHECKING:
     from io import BufferedReader
     from luster.state import State
-    from luster.types.users import (
-        User as UserData,
-        Relationship as RelationshipData,
-        Profile as ProfileData,
-        Status as StatusData,
-        PartialUserBot as PartialUserBotData,
-    )
-    from luster.types.enums import (
-        RelationshipStatus as RawRelationshipStatus,
-        PresenceType as RawPresenceType,
-    )
+    from luster import types
 
 
 __all__ = (
@@ -56,7 +48,7 @@ class Relationship(StateAware):
     """
     if TYPE_CHECKING:
         id: str
-        status: RawRelationshipStatus
+        status: types.RelationshipStatus
 
     __slots__ = (
         "_state",
@@ -65,12 +57,15 @@ class Relationship(StateAware):
         "status",
     )
 
-    def __init__(self, data: RelationshipData, user: User) -> None:
+    def __init__(self, data: types.Relationship, user: User) -> None:
         self.user = user
         self._state = user.state
         self._update_from_data(data)
 
-    def _update_from_data(self, data: RelationshipData):
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(id={self.id!r}, status={self.status!r})"
+
+    def _update_from_data(self, data: types.Relationship):
         self.id = data["_id"]
         self.status = data["status"]
 
@@ -98,12 +93,15 @@ class Profile(StateAware):
         "background",
     )
 
-    def __init__(self, data: ProfileData, user: User) -> None:
+    def __init__(self, data: types.Profile, user: User) -> None:
         self.user = user
         self._state = user.state
         self._update_from_data(data)
 
-    def _update_from_data(self, data: ProfileData):
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(content={self.content!r}, background={self.background!r})"
+
+    def _update_from_data(self, data: types.Profile):
         self.content = data.get("content")
 
         background = data.get("background")
@@ -126,7 +124,7 @@ class Status(StateAware):
     """
     if TYPE_CHECKING:
         text: Optional[str]
-        presence: RawPresenceType
+        presence: types.PresenceType
 
     __slots__ = (
         "_state",
@@ -135,12 +133,15 @@ class Status(StateAware):
         "presence",
     )
 
-    def __init__(self, data: StatusData, user: User) -> None:
+    def __init__(self, data: types.Status, user: User) -> None:
         self.user = user
         self._state = user.state
         self._update_from_data(data)
 
-    def _update_from_data(self, data: StatusData):
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(text={self.text!r}, presence={self.presence!r})"
+
+    def _update_from_data(self, data: types.Status):
         self.text = data.get("text")
         self.presence = handle_optional_field(data, "presence", PresenceType.INVISIBLE, None)
 
@@ -167,16 +168,19 @@ class PartialUserBot(StateAware):
         "owner_id",
     )
 
-    def __init__(self, data: PartialUserBotData, user: User) -> None:
+    def __init__(self, data: types.PartialUserBot, user: User) -> None:
         self.user = user
         self._state = user.state
         self._update_from_data(data)
 
-    def _update_from_data(self, data: PartialUserBotData):
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(user={self.user!r}, owner_id={self.owner_id!r})"
+
+    def _update_from_data(self, data: types.PartialUserBot):
         self.owner_id = data["owner"]
 
 
-class User(StateAware):
+class User(StateAware, UpdateHandler[UserUpdateEventData]):
     """Represents a user entity.
 
     Attributes
@@ -212,7 +216,7 @@ class User(StateAware):
         badges: int
         flags: int
         privileged: bool
-        relationship: RawRelationshipStatus
+        relationship: types.RelationshipStatus
         online: bool
         relationships: List[Relationship]
         profile: Optional[Profile]
@@ -234,14 +238,14 @@ class User(StateAware):
         "bot",
     )
 
-    def __init__(self, data: UserData, state: State) -> None:
+    def __init__(self, data: types.User, state: State) -> None:
         self._state = state
         self._update_from_data(data)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(id={self.id!r}, username={self.username!r})"
 
-    def _update_from_data(self, data: UserData):
+    def _update_from_data(self, data: types.User) -> None:
         self.id = data["_id"]
         self.username = data["username"]
         self.badges = handle_optional_field(data, "badges", 0, None)
@@ -261,6 +265,52 @@ class User(StateAware):
         self.profile = Profile(profile, self) if profile else None
         self.status = Status(status, self) if status else None
         self.bot = PartialUserBot(bot, self) if bot else None
+
+    def handle_field_removals(self, fields: List[types.UserRemoveField]) -> None:
+        for field in fields:
+            if field == "Avatar":
+                self.avatar = None
+            elif field == "StatusText":
+                if self.status:
+                    self.status.text = None
+            elif field == "ProfileContent":
+                if self.profile:
+                    self.profile.content = None
+            elif field == "ProfileBackground":
+                if self.profile:
+                    self.profile.background = None
+
+    @handle_update("username")
+    def _handle_update_username(self, new: str) -> None:
+        self.username = new
+
+    @handle_update("badges")
+    def _handle_update_badges(self, new: Optional[int]) -> None:
+        self.badges = new or 0
+
+    @handle_update("flags")
+    def _handle_update_flags(self, new: Optional[int]) -> None:
+        self.flags = new or 0
+
+    @handle_update("privileged")
+    def _handle_update_privileged(self, new: bool) -> None:
+        self.privileged = new
+
+    @handle_update("online")
+    def _handle_update_online(self, new: bool) -> None:
+        self.online = new
+
+    @handle_update("avatar")
+    def _handle_update_avatar(self, new: types.File) -> None:
+        self.avatar = File(new, self._state)
+
+    @handle_update("profile")
+    def _handle_update_profile(self, new: types.Profile) -> None:
+        self.profile = Profile(new, self)
+
+    @handle_update("status")
+    def _handle_update_status(self, new: types.Status) -> None:
+        self.status = Status(new, self)
 
     @property
     def default_avatar_url(self) -> str:
@@ -322,7 +372,7 @@ class User(StateAware):
         self,
         *,
         status_text: Optional[str] = MISSING,
-        status_presence: Optional[RawPresenceType] = MISSING,
+        status_presence: Optional[types.PresenceType] = MISSING,
         profile_content: Optional[str] = MISSING,
         profile_background: Optional[Union[str, BufferedReader]] = MISSING,
         avatar: Optional[Union[str, BufferedReader]] = MISSING,

@@ -5,18 +5,21 @@ from __future__ import annotations
 from typing import (
     Any,
     List,
+    Optional,
     TypedDict,
     Literal,
     TYPE_CHECKING,
 )
 from typing_extensions import NotRequired
+from luster.types.file import File
+from luster.types.users import Profile, Status, User
 
-from luster.types.users import User
 
 if TYPE_CHECKING:
     from luster.types.enums import (
         EventTypeRecv,
         ErrorId,
+        UserRemoveField,
     )
 
 
@@ -33,6 +36,8 @@ __all__ = (
     "BulkEvent",
     "PongEvent",
     "ReadyEvent",
+    "UserUpdateEvent",
+    "UserUpdateEventData",
 )
 
 class BaseWebsocketEvent(TypedDict):
@@ -132,3 +137,51 @@ class ReadyEvent(TypedDict):
 
     emojis: NotRequired[List[Any]]  # TODO: Typehint as Emoji
     """The list of servers."""
+
+
+class UserUpdateEventData(TypedDict, total=False):
+    """Represents the data inside a :class:`UserUpdateEvent`.
+
+    This is equivalent to a "partial" user. All the fields
+    in this type are optional.
+    """
+
+    username: str
+    """The username of user."""
+
+    flags: Optional[int]
+    """The user's flags."""
+
+    badges: Optional[int]
+    """The user's badges."""
+
+    privileged: bool
+    """Whether this user is privileged."""
+
+    online: bool
+    """Whether this user is online."""
+
+    avatar: File
+    """The avatar of this user."""
+
+    profile: Profile
+    """The profile of this user."""
+
+    status: Status
+    """The user's current status."""
+
+
+class UserUpdateEvent(TypedDict):
+    """Represents an event indicating that a user was updated."""
+
+    type: Literal["UserUpdate"]
+    """The type of event."""
+
+    id: str
+    """The ID of user that was updated."""
+
+    clear: List[UserRemoveField]
+    """The fields to remove from user."""
+
+    data: UserUpdateEventData
+    """The fields that were updated."""
