@@ -70,3 +70,8 @@ Ready
 .. autoclass:: Ready
     :members:
 
+UserUpdate
+~~~~~~~~~~
+
+.. autoclass:: UserUpdate
+    :members:

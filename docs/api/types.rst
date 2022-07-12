@@ -286,3 +286,21 @@ BulkEvent
 
 .. autoclass:: BulkEvent()
     :members:
+
+ReadyEvent
+~~~~~~~~~~
+
+.. autoclass:: ReadyEvent()
+    :members:
+
+UserUpdateEvent
+~~~~~~~~~~~~~~~
+
+.. autoclass:: UserUpdateEvent()
+    :members:
+
+UserUpdateEventData
+~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: UserUpdateEventData()
+    :members:
