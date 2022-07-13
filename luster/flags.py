@@ -14,9 +14,7 @@ from typing import (
 )
 import inspect
 
-__all__ = (
-    "Permissions",
-)
+__all__ = ()
 
 
 BaseFlagsT = TypeVar("BaseFlagsT", bound="BaseFlags")
