@@ -61,6 +61,12 @@ class Client(ListenersMixin):
     cache_cls: Type[:class:`Cache`]
         The class type of :class:`Cache`. This can be used
         to set custom subclasses on :attr:`.cache`.
+
+    Attributes
+    ----------
+    user: Optional[:class:`User`]
+        The user for the connected client. This is only set after connection
+        with Revolt API has been made.
     """
 
     def __init__(
@@ -83,9 +89,10 @@ class Client(ListenersMixin):
         )
         self.__events_handler = EventsHandler(state=self.__state)
         self.__initialized: bool = False
-
         self.__state.set_client(self)
-        self.__websocket_handler.set_events_handler(self.__events_handler) 
+        self.__websocket_handler.set_events_handler(self.__events_handler)
+
+        self.user: Optional[User] = None
 
     async def __aenter__(self) -> Self:
         await self._async_init()
@@ -174,6 +181,7 @@ class Client(ListenersMixin):
         await self.__http_handler.close()
         await self.__websocket_handler.close()
 
+        self.user = None
         self.__initialized = False
         await self.close_hook()
 
