@@ -13,6 +13,7 @@ from typing import (
 from typing_extensions import NotRequired
 from luster.types.file import File
 from luster.types.users import Profile, Status, User
+from luster.types.servers import Server
 
 
 if TYPE_CHECKING:
@@ -131,7 +132,7 @@ class ReadyEvent(TypedDict):
     users: List[User]
     """The list of users the client can see."""
 
-    servers: List[Any]  # TODO: Typehint as Server
+    servers: List[Server]
     """The list of servers."""
 
     channels: List[Any]  # TODO: Typehint as Channel

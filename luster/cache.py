@@ -7,6 +7,7 @@ from luster.internal.mixins import StateManagementMixin
 
 if TYPE_CHECKING:
     from luster.users import User
+    from luster.server import Server
 
 
 class Cache(StateManagementMixin):
@@ -27,6 +28,7 @@ class Cache(StateManagementMixin):
 
     def clear(self) -> None:
         self.__users: Dict[str, User] = {}
+        self.__servers: Dict[str, Server] = {}
 
     def users(self) -> List[User]:
         """The users that are currently cached.
@@ -54,7 +56,7 @@ class Cache(StateManagementMixin):
 
         Parameters
         ----------
-        user_id: :class:`User`
+        user_id: :class:`str`
             The ID of user to get.
 
         Returns
@@ -69,7 +71,7 @@ class Cache(StateManagementMixin):
 
         Parameters
         ----------
-        user_id: :class:`User`
+        user_id: :class:`str`
             The ID of user to remove.
 
         Returns
@@ -78,3 +80,54 @@ class Cache(StateManagementMixin):
             The remoevd user; if exists. Otherwise ``None``.
         """
         return self.__users.pop(user_id, None)
+
+    def servers(self) -> List[Server]:
+        """The servers that are currently cached.
+
+        Returns
+        -------
+        List[:class:`Server`]
+        """
+        return list(self.__servers.values())
+
+    def add_server(self, server: Server) -> None:
+        """Adds a new server to the cache.
+
+        If a similar server already exists, It will be overwritten.
+
+        Parameters
+        ----------
+        server: :class:`Server`
+            The server to add.
+        """
+        self.__servers[server.id] = server
+
+    def get_server(self, server_id: str) -> Optional[Server]:
+        """Gets a server from the cache.
+
+        Parameters
+        ----------
+        server_id: :class:`str`
+            The ID of server to get.
+
+        Returns
+        -------
+        Optional[:class:`Server`]
+            The requested server; if exists. Otherwise ``None``.
+        """
+        return self.__servers.get(server_id)
+
+    def remove_server(self, server_id: str) -> Optional[Server]:
+        """Removes a server from the cache.
+
+        Parameters
+        ----------
+        server_id: :class:`str`
+            The ID of server to remove.
+
+        Returns
+        -------
+        Optional[:class:`Server`]
+            The remoevd server; if exists. Otherwise ``None``.
+        """
+        return self.__servers.pop(server_id, None)

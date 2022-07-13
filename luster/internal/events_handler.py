@@ -14,6 +14,7 @@ from typing import (
 from abc import ABC, abstractmethod
 from luster.exceptions import WebsocketError
 from luster.users import User, Relationship
+from luster.server import Server
 from luster.enums import RelationshipStatus
 from luster import events
 
@@ -245,9 +246,11 @@ class EventsHandler(ListenersMixin):
     @event_handler("Ready")
     async def on_ready(self, data: types.ReadyEvent) -> None:
         state = self._state
-        users = data.get("users", [])
 
-        _LOGGER.info("Preparing cache for %r users", len(users))
+        users = data.get("users", [])
+        servers = data.get("servers", [])
+
+        _LOGGER.info("Preparing client cache. (%r users, %r servers)", len(users), len(servers))
 
         for user in users:
             obj = User(user, state)
@@ -258,7 +261,10 @@ class EventsHandler(ListenersMixin):
                 if client:
                     client.user = obj
 
-        _LOGGER.info("Client is ready.")
+        for server in servers:
+            state.cache.add_server(Server(server, state))
+
+        _LOGGER.info("Successfully cached the entities.")
 
         event = events.Ready()
         self.call_listeners(event)
