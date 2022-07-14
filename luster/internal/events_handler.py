@@ -16,6 +16,7 @@ from luster.exceptions import WebsocketError
 from luster.users import User, Relationship
 from luster.server import Server
 from luster.enums import RelationshipStatus
+from luster.channels import channel_factory
 from luster import events
 
 import asyncio
@@ -249,8 +250,10 @@ class EventsHandler(ListenersMixin):
 
         users = data.get("users", [])
         servers = data.get("servers", [])
+        channels = data.get("channels", [])
 
-        _LOGGER.info("Preparing client cache. (%r users, %r servers)", len(users), len(servers))
+        _LOGGER.info("Preparing client cache. (%r users, %r servers, %r channels)",
+                     len(users), len(servers), len(channels))
 
         for user in users:
             obj = User(user, state)
@@ -263,6 +266,11 @@ class EventsHandler(ListenersMixin):
 
         for server in servers:
             state.cache.add_server(Server(server, state))
+
+        for channel in channels:
+            cls = channel_factory(channel["channel_type"])
+            # Type checker fails to resolve signature of cls
+            state.cache.add_channel(cls(channel, state))  # type: ignore
 
         _LOGGER.info("Successfully cached the entities.")
 

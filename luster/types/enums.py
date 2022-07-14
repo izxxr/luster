@@ -17,7 +17,7 @@ __all__ = (
     "PresenceType",
     "RelationshipStatus",
     "UserRemoveField",
-    "ChannelTypeGuild",
+    "ChannelTypeServer",
     "ChannelTypePrivate",
     "ChannelType",
 )
@@ -47,6 +47,6 @@ RelationshipStatus = Literal["None", "User", "Friend", "Outgoing", "Incoming", "
 UserRemoveField = Literal["Avatar", "StatusText", "StatusPresence", "ProfileContent", "ProfileBackground"]
 
 # Channels
-ChannelTypeGuild = Literal["TextChannel", "VoiceChannel"]
+ChannelTypeServer = Literal["TextChannel", "VoiceChannel"]
 ChannelTypePrivate = Literal["SavedMessages", "DirectMessage", "Group"]
-ChannelType = Union[ChannelTypeGuild, ChannelTypePrivate]
+ChannelType = Union[ChannelTypeServer, ChannelTypePrivate]

@@ -63,6 +63,17 @@ This section documents various enumerations from the Revolt API. All these are t
 
     The fields that can be removed from a user object.
 
+.. data:: ChannelTypeServer
+
+    The channel types related to a server.
+
+.. data:: ChannelTypePrivate
+
+    The channel types for private channels.
+
+.. data:: ChannelType
+
+    All channel types.
 
 API Models
 ----------
@@ -201,12 +212,12 @@ VoiceChannel
 .. autoclass:: VoiceChannel()
     :members:
 
-GuildChannel
+ServerChannel
 ~~~~~~~~~~~~
 
-.. data:: GuildChannel
+.. data:: ServerChannel
 
-    A type alias for :class:`typing.Union` of various guild channels.
+    A type alias for :class:`typing.Union` of various Server channels.
 
     This currently includes:
 

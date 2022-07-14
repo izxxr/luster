@@ -8,6 +8,7 @@ __all__ = (
     "RelationshipStatus",
     "PresenceType",
     "FileTag",
+    "ChannelType",
 )
 
 
@@ -101,3 +102,22 @@ class FileTag:
 
     ICONS = "icons"
     """The file is an icon."""
+
+
+class ChannelType:
+    """An enumeration detailing values for a channel :attr:`~ServerChannel.type`."""
+
+    SAVED_MESSAGES = "SavedMessages"
+    """Saved notes channel."""
+
+    DIRECT_MESSAGE = "DirectMessage"
+    """A DM channel between two users."""
+
+    GROUP = "Group"
+    """A private group between several users."""
+
+    TEXT_CHANNEL = "TextChannel"
+    """A text channel belonging to a server."""
+
+    VOICE_CHANNEL = "VoiceChannel"
+    """A voice channel belonging to a server."""

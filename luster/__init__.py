@@ -18,6 +18,7 @@ __url__ = "https://github.com/nerdguyahmad/luster"
 
 from luster import events as events
 from luster.cache import *
+from luster.channels import *
 from luster.client import *
 from luster.enums import *
 from luster.exceptions import *

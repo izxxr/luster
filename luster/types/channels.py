@@ -15,7 +15,7 @@ __all__ = (
     "Group",
     "TextChannel",
     "VoiceChannel",
-    "GuildChannel",
+    "ServerChannel",
     "PrivateChannel",
     "Channel",
 )
@@ -143,6 +143,6 @@ class VoiceChannel(_BaseServerChannel):
     """The type of this channel."""
 
 
-GuildChannel = Union[TextChannel, VoiceChannel]
+ServerChannel = Union[TextChannel, VoiceChannel]
 PrivateChannel = Union[SavedMessages, DirectMessage, Group]
-Channel = Union[GuildChannel, PrivateChannel]
+Channel = Union[ServerChannel, PrivateChannel]
