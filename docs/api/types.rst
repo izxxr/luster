@@ -170,6 +170,69 @@ Permissions
 .. autoclass:: Permissions()
     :members:
 
+SavedMessages
+~~~~~~~~~~~~~
+
+.. autoclass:: SavedMessages()
+    :members:
+
+DirectMessage
+~~~~~~~~~~~~~
+
+.. autoclass:: DirectMessage()
+    :members:
+
+
+Group
+~~~~~
+
+.. autoclass:: Group()
+    :members:
+
+TextChannel
+~~~~~~~~~~~
+
+.. autoclass:: TextChannel()
+    :members:
+
+VoiceChannel
+~~~~~~~~~~~~
+
+.. autoclass:: VoiceChannel()
+    :members:
+
+GuildChannel
+~~~~~~~~~~~~
+
+.. data:: GuildChannel
+
+    A type alias for :class:`typing.Union` of various guild channels.
+
+    This currently includes:
+
+    - :class:`TextChannel`
+    - :class:`VoiceChannel`
+
+PrivateChannel
+~~~~~~~~~~~~~~
+
+.. data:: PrivateChannel
+
+    A type alias for :class:`typing.Union` of various private channel types.
+
+    This currently includes:
+
+    - :class:`SavedMessages`
+    - :class:`DirectMessages`
+    - :class:`Group`
+
+Channel
+~~~~~~~
+
+.. data:: Channel
+
+    A type alias for :class:`typing.Union` of all channel types mentioned above.
+
 
 HTTP Routes
 -----------

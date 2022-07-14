@@ -11,6 +11,7 @@ from typing import (
     TYPE_CHECKING,
 )
 from typing_extensions import NotRequired
+from luster.types.channels import Channel
 from luster.types.file import File
 from luster.types.users import Profile, Status, User
 from luster.types.servers import Server
@@ -135,7 +136,7 @@ class ReadyEvent(TypedDict):
     servers: List[Server]
     """The list of servers."""
 
-    channels: List[Any]  # TODO: Typehint as Channel
+    channels: List[Channel]
     """The list of channels."""
 
     emojis: NotRequired[List[Any]]  # TODO: Typehint as Emoji
