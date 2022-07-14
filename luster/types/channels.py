@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Literal, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Dict, List, Literal, Optional, TypedDict, Union
 from typing_extensions import NotRequired
 from luster.types.file import File
 from luster.types.roles import Permissions
+
+if TYPE_CHECKING:
+    from luster.types.enums import ChannelRemoveField
 
 
 __all__ = (
@@ -18,6 +21,14 @@ __all__ = (
     "ServerChannel",
     "PrivateChannel",
     "Channel",
+
+    # HTTP API
+    "FetchDirectMessageChannels",
+    "OpenDirectMessage",
+    "FetchChannel",
+    "CloseChannel",
+    "EditChannelJSON",
+    "EditChannelResponse",
 )
 
 
@@ -142,7 +153,36 @@ class VoiceChannel(_BaseServerChannel):
     channel_type: Literal["VoiceChannel"]
     """The type of this channel."""
 
-
+# type aliases below are not subject to autodoc and are
+# manually documented due to Sphinx limitations.
 ServerChannel = Union[TextChannel, VoiceChannel]
 PrivateChannel = Union[SavedMessages, DirectMessage, Group]
 Channel = Union[ServerChannel, PrivateChannel]
+
+# --- HTTP ---
+
+FetchDirectMessageChannels = List[Union[DirectMessage, Group]]
+OpenDirectMessage = Union[DirectMessage, SavedMessages]
+FetchChannel = Channel
+CloseChannel = Literal[None]
+
+
+class EditChannelJSON(TypedDict):
+    """Represents the JSON body for :meth:`luster.HTTPHandler.edit_channel` route."""
+
+    name: NotRequired[str]
+    """The name of channel."""
+
+    description: NotRequired[str]
+    """The description of channel."""
+
+    icon: NotRequired[str]
+    """The attachment ID for channel icon."""
+
+    nsfw: NotRequired[bool]
+    """Whether to mark the channel as NSFW."""
+
+    remove: NotRequired[List[ChannelRemoveField]]
+    """The list of fields to remove."""
+
+EditChannelResponse = Channel

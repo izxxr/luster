@@ -61,7 +61,7 @@ This section documents various enumerations from the Revolt API. All these are t
 
 .. data:: UserRemoveField
 
-    The fields that can be removed from a user object.
+    The fields that can be removed from a user object by editing it.
 
 .. data:: ChannelTypeServer
 
@@ -74,6 +74,11 @@ This section documents various enumerations from the Revolt API. All these are t
 .. data:: ChannelType
 
     All channel types.
+
+.. data:: ChannelRemoveField
+
+    The fields that can be removed from channel object by editing it.
+
 
 API Models
 ----------
@@ -304,6 +309,64 @@ UploadFileResponse
 
 .. autoclass:: UploadFileResponse()
     :members:
+
+FetchDirectMessageChannels
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: FetchDirectMessageChannels
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.fetch_direct_message_channels`
+    route.
+
+    This is equivalent to :class:`typing.List` of :class:`DirectMessage` and :class:`Group`.
+
+OpenDirectMessage
+~~~~~~~~~~~~~~~~~
+
+.. data:: OpenDirectMessage
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.open_direct_message`
+    route.
+
+    This is equivalent to :class:`typing.Union` of :class:`DirectMessage` and :class:`SavedMessages`.
+
+FetchChannel
+~~~~~~~~~~~~
+
+.. data:: FetchChannel
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.fetch_channel`
+    route.
+
+    This is equivalent to :data:`Channel`.
+
+
+CloseChannel
+~~~~~~~~~~~~
+
+.. data:: CloseChannel
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.close_channel`
+    route.
+
+    This is equivalent to Literal[``None``].
+
+
+EditChannelJSON
+~~~~~~~~~~~~~~~
+
+.. autoclass:: EditChannelJSON
+    :members:
+
+EditChannelResponse
+~~~~~~~~~~~~~~~~~~~
+
+.. data:: EditChannelResponse
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.edit_channel`
+    route.
+
+    This is equivalent to :data:`Channel`.
 
 
 Websocket Events

@@ -20,6 +20,7 @@ __all__ = (
     "ChannelTypeServer",
     "ChannelTypePrivate",
     "ChannelType",
+    "ChannelRemoveField"
 )
 
 
@@ -50,3 +51,4 @@ UserRemoveField = Literal["Avatar", "StatusText", "StatusPresence", "ProfileCont
 ChannelTypeServer = Literal["TextChannel", "VoiceChannel"]
 ChannelTypePrivate = Literal["SavedMessages", "DirectMessage", "Group"]
 ChannelType = Union[ChannelTypeServer, ChannelTypePrivate]
+ChannelRemoveField = Literal["Description", "Icon", "DefaultPermissions"]
