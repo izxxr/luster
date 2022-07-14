@@ -8,6 +8,7 @@ from luster.internal.mixins import StateAware
 from luster.file import File
 
 if TYPE_CHECKING:
+    from luster.channels import ServerChannel
     from luster.state import State
     from luster import types
 
@@ -94,3 +95,21 @@ class Server(StateAware):
 
         self.icon = File(icon, self._state) if icon else None
         self.banner = File(banner, self._state) if banner else None
+
+    def channels(self) -> List[ServerChannel]:
+        """The list of channels in this server.
+
+        Returns
+        -------
+        List[:class:`ServerChannel`]
+        """
+        channels: List[ServerChannel] = []
+        cache = self._state.cache
+
+        for channel_id in self.channel_ids:
+            channel = cache.get_channel(channel_id)
+            if channel is not None:
+                # narrowed type is always ServerChannel
+                channels.append(channel)  # type: ignore
+
+        return channels
