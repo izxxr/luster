@@ -5,8 +5,10 @@ from __future__ import annotations
 from typing import (
     TYPE_CHECKING,
     Callable,
+    List,
     Optional,
     Type,
+    Union,
 )
 from typing_extensions import Self
 from luster.internal.events_handler import BE, EventsHandler, ListenersMixin, Listener
@@ -16,11 +18,13 @@ from luster.cache import Cache
 from luster.state import State
 from luster.users import User
 from luster.file import PartialUploadedFile
+from luster.channels import ChannelT, channel_factory
 
 import asyncio
 
 if TYPE_CHECKING:
     from aiohttp import ClientSession
+    from luster.channels import DirectMessage, Group
     from luster import types
     from io import BufferedReader
 
@@ -314,3 +318,51 @@ class Client(ListenersMixin):
         }
         data = await self.__http_handler.change_username(json)
         return User(data, self.__state)
+
+    # Channels
+
+    async def fetch_channel(self, channel_id: str) -> ChannelT:
+        """Fetches a channel.
+
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The ID of channel to fetch.
+
+        Returns
+        -------
+        Union[:class:`ServerChannel`, :class:`PrivateChannel`]
+            The fetched channel.
+
+        Raises
+        ------
+        HTTPException
+            The fetching failed.
+        HTTPNotFound
+            Invalid channel ID.
+        """
+        data = await self.__http_handler.fetch_channel(channel_id)
+        cls = channel_factory(data["channel_type"])
+        return cls(data, self.__state)  # type: ignore
+
+    async def fetch_dms(self) -> List[Union[DirectMessage, Group]]:
+        """Fetches the direct messages and groups that are currently opened.
+
+        Returns
+        -------
+        List[Union[:class:`DirectMessage`, :class:`Group`]]
+            The current direct message channels.
+
+        Raises
+        ------
+        HTTPException
+            The fetching failed.
+        """
+        data = await self.__http_handler.fetch_direct_message_channels()
+        ret: List[Union[DirectMessage, Group]] = []
+
+        for item in data:
+            cls = channel_factory(item["channel_type"])
+            ret.append(cls(item, self.__state))  # type: ignore
+
+        return ret

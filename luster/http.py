@@ -450,3 +450,87 @@ class HTTPHandler(StateManagementMixin):
         """
         data = await self.request("GET", f"/users/{user_id}/profile")
         return data
+
+    # Channels
+
+    async def fetch_direct_message_channels(self) -> types.FetchDirectMessageChannelsResponse:
+        """Fetches the direct message channels.
+
+        This returns all currently open direct messages and
+        group channels that user is part of.
+
+        Returns
+        -------
+        :class:`types.FetchDirectMessageChannelsResponse`
+        """
+        data = await self.request("GET", "/users/dms")
+        return data
+
+    async def open_direct_message(self, user_id: str) -> types.OpenDirectMessageResponse:
+        """Opens the direct message channel with a user.
+
+        This returns the opened direct message or saved messages
+        channel if the given user ID belongs to ownself.
+
+        Parameters
+        ----------
+        user_id: :class:`str`
+            The ID of user to open direct message channel with.
+
+        Returns
+        -------
+        :class:`types.OpenDirectMessageResponse`
+        """
+        data = await self.request("GET", f"/users/{user_id}/dms")
+        return data
+
+    async def fetch_channel(self, channel_id: str) -> types.FetchChannelResponse:
+        """Fetches the channel by it's ID.
+
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The ID of channel to fetch.
+
+        Returns
+        -------
+        :class:`types.FetchChannelResponse`
+        """
+        data = await self.request("GET", f"/channels/{channel_id}")
+        return data
+
+    async def delete_channel(self, channel_id: str) -> types.DeleteChannelResponse:
+        """Deletes the channel by it's ID.
+
+        For server channel, This route deletes the channel and
+        for direct messages and groups, This route leaves or
+        closes the channel.
+
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The ID of channel to delete.
+
+        Returns
+        -------
+        :class:`types.DeleteChannelResponse`
+        """
+        data = await self.request("DELETE", f"/channels/{channel_id}")
+        return data
+
+    async def edit_channel(self, channel_id: str, json: types.EditChannelJSON) -> types.EditChannelResponse:
+        """Edits a channel.
+
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The ID of channel to delete.
+        json: :class:`types.EditChannelJSON`
+            The JSON body for request.
+
+        Returns
+        -------
+        :class:`types.EditChannelResponse`
+        """
+        data = await self.request("PATCH", f"/channels/{channel_id}", json=json)
+        return data

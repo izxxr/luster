@@ -23,10 +23,10 @@ __all__ = (
     "Channel",
 
     # HTTP API
-    "FetchDirectMessageChannels",
-    "OpenDirectMessage",
-    "FetchChannel",
-    "CloseChannel",
+    "FetchDirectMessageChannelsResponse",
+    "OpenDirectMessageResponse",
+    "FetchChannelResponse",
+    "DeleteChannelResponse",
     "EditChannelJSON",
     "EditChannelResponse",
 )
@@ -161,10 +161,10 @@ Channel = Union[ServerChannel, PrivateChannel]
 
 # --- HTTP ---
 
-FetchDirectMessageChannels = List[Union[DirectMessage, Group]]
-OpenDirectMessage = Union[DirectMessage, SavedMessages]
-FetchChannel = Channel
-CloseChannel = Literal[None]
+FetchDirectMessageChannelsResponse = List[Union[DirectMessage, Group]]
+OpenDirectMessageResponse = Union[DirectMessage, SavedMessages]
+FetchChannelResponse = Channel
+DeleteChannelResponse = Literal[None]
 
 
 class EditChannelJSON(TypedDict):

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
 from luster.internal.mixins import StateAware
+from luster.internal.helpers import MISSING, upsert_remove_value
 from luster.enums import ChannelType
 from luster.file import File
 from luster.users import User
@@ -44,7 +45,65 @@ def channel_factory(tp: Any) -> Type[ChannelT]:
     return PrivateChannel
 
 
-class ServerChannel(StateAware):
+class _EditChannelMixin(StateAware):
+    id: str
+
+    async def edit(
+        self,
+        *,
+        name: str = MISSING,
+        description: Optional[str] = MISSING,
+        icon: Optional[str] = MISSING,
+        nsfw: bool = MISSING,
+    ) -> None:
+        """Edits the channel.
+
+        This requires the :attr:`Permissions.manage_channel` permission
+        in the group channel or the parent server when called in a server
+        channel context.
+
+        Parameters
+        ----------
+        name: Optional[:class:`str`]
+            The name of this channel.
+        description: Optional[:class:`str`]
+            The description of this channel. Passing ``None`` will
+            remove the description.
+        icon: Optional[Union[:class:`str`, :class:`io.BufferedReader`]]
+            The icon of this channel.
+            |attachment-parameter-note|
+        nsfw: :class:`bool`
+            Whether this channel is marked as NSFW.
+        """
+        json = {}
+
+        if name:
+            json["name"] = name
+
+        if description is not MISSING:
+            if description is None:
+                upsert_remove_value(json, "Description")
+            else:
+                json["description"] = description
+
+        if icon is not MISSING:
+            if icon is None:
+                upsert_remove_value(json, "Icon")
+            else:
+                json["icon"] = icon
+
+        if nsfw is not MISSING:
+            json["nsfw"] = nsfw
+
+        if json:
+            # data is equivalent to types.EditChannelJSON now
+            data = await self._state.http_handler.edit_channel(self.id, json=json)  # type: ignore
+
+            # self.__class__ will resolve to a valid channel type
+            return self.__class__(data, self._state)  # type: ignore
+
+
+class ServerChannel(_EditChannelMixin):
     """The common base class for channels in a server.
 
     For convenience, This type has been narrowed down to following
@@ -113,6 +172,21 @@ class ServerChannel(StateAware):
         """
         return self._state.cache.get_server(self.server_id)
 
+    async def delete(self) -> None:
+        """Deletes the channel.
+
+        This operation requires the :attr:`Permissions.manage_channels`
+        permission in the parent server.
+
+        Raises
+        ------
+        HTTPException
+            The deletion failed.
+        HTTPForbidden
+            You are not allowed to do this.
+        """
+        await self._state.http_handler.delete_channel(self.id)
+
 
 class TextChannel(ServerChannel):
     """Represents a text channel in a server.
@@ -176,6 +250,25 @@ class PrivateChannel(StateAware):
         self.id = data["_id"]
         self.type = data["channel_type"]
 
+    async def delete(self) -> None:
+        """Deletes the channel.
+
+        In case of groups, This leaves the channel and in case of direct
+        messages, This closes the channel.
+
+        When called in a group context, :attr:`~Permissions.manage_channel`
+        permission is required.
+
+        Raises
+        ------
+        HTTPException
+            The deletion failed.
+        HTTPForbidden
+            You are not allowed to do this.
+        """
+        await self._state.http_handler.delete_channel(self.id)
+
+
 
 class SavedMessages(PrivateChannel):
     """Represents a saved messages channel.
@@ -229,7 +322,7 @@ class DirectMessage(PrivateChannel):
         self.last_message_id = data.get("last_message_id")
 
 
-class Group(PrivateChannel):
+class Group(PrivateChannel, _EditChannelMixin):
     """Represents a group channel between several users.
 
     This class inherits :class:`PrivateChannel` class.

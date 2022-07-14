@@ -310,30 +310,30 @@ UploadFileResponse
 .. autoclass:: UploadFileResponse()
     :members:
 
-FetchDirectMessageChannels
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+FetchDirectMessageChannelsResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. data:: FetchDirectMessageChannels
+.. data:: FetchDirectMessageChannelsResponse
 
     A type alias representing the response of :meth:`luster.HTTPHandler.fetch_direct_message_channels`
     route.
 
     This is equivalent to :class:`typing.List` of :class:`DirectMessage` and :class:`Group`.
 
-OpenDirectMessage
-~~~~~~~~~~~~~~~~~
+OpenDirectMessageResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. data:: OpenDirectMessage
+.. data:: OpenDirectMessageResponse
 
     A type alias representing the response of :meth:`luster.HTTPHandler.open_direct_message`
     route.
 
     This is equivalent to :class:`typing.Union` of :class:`DirectMessage` and :class:`SavedMessages`.
 
-FetchChannel
-~~~~~~~~~~~~
+FetchChannelResponse
+~~~~~~~~~~~~~~~~~~~~
 
-.. data:: FetchChannel
+.. data:: FetchChannelResponse
 
     A type alias representing the response of :meth:`luster.HTTPHandler.fetch_channel`
     route.
@@ -341,10 +341,10 @@ FetchChannel
     This is equivalent to :data:`Channel`.
 
 
-CloseChannel
-~~~~~~~~~~~~
+DeleteChannelResponse
+~~~~~~~~~~~~~~~~~~~~~
 
-.. data:: CloseChannel
+.. data:: DeleteChannelResponse
 
     A type alias representing the response of :meth:`luster.HTTPHandler.close_channel`
     route.
