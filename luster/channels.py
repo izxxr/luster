@@ -6,8 +6,10 @@ from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
 from luster.internal.mixins import StateAware
 from luster.enums import ChannelType
 from luster.file import File
+from luster.users import User
 
 if TYPE_CHECKING:
+    from luster.server import Server
     from luster.state import State
     from luster import types
 
@@ -96,6 +98,20 @@ class ServerChannel(StateAware):
         self.name = data["name"]
         self.description = data.get("description")
         self.nsfw = data.get("nsfw", False)
+
+    @property
+    def server(self) -> Optional[Server]:
+        """The server for this channel.
+
+        This property might rarely return None if the server
+        relating to this channel is not cached.
+
+        Returns
+        -------
+        Optional[:class:`Server`]
+            The channel's server.
+        """
+        return self._state.cache.get_server(self.server_id)
 
 
 class TextChannel(ServerChannel):
@@ -267,3 +283,20 @@ class Group(PrivateChannel):
 
         icon = data.get("icon")
         self.icon = File(icon, self._state) if icon else None
+
+    async def fetch_owner(self) -> User:
+        """Fetches the user that owns this group.
+
+        Returns
+        -------
+        :class:`User`
+            The group owner.
+
+        Raises
+        ------
+        HTTPException
+            Failed to fetch the owner.
+        """
+        state = self._state
+        data = await state.http_handler.fetch_user(self.owner_id)
+        return User(data, state)
