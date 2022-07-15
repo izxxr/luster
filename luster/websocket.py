@@ -17,8 +17,6 @@ import random
 import time
 import traceback
 
-
-
 if TYPE_CHECKING:
     from aiohttp import ClientWebSocketResponse
     from luster.internal.events_handler import EventsHandler
