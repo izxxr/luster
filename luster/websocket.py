@@ -110,11 +110,25 @@ class WebsocketHandler(StateManagementMixin):
         """
         return self.__closed
 
-    async def get_websocket_url(self) -> str:
+    async def get_websocket_url(
+        self,
+        *,
+        include_token: bool = True,
+        transport_format: Optional[types.WebsocketFormat] = None,
+    ) -> str:
         """Gets the websocket URL including relevant parameters.
 
         This under the hood uses the :meth:`HTTPHandler.query_node`
         route to retrieve the websocket URL.
+
+        Parameters
+        ----------
+        include_token: :class:`bool`
+            Whether to include token in the returned URL.
+        transport_format: :class:`types.WebsocketFormat`
+            The format to use for websocket packets transporation.
+            By default or by omitting this parameter, The ideal format
+            is automatically selected.
 
         Returns
         -------
@@ -123,8 +137,15 @@ class WebsocketHandler(StateManagementMixin):
         """
         http_handler = self.__http_handler
         data = await http_handler.query_node()
-        fmt = "msgpack" if _HAS_MSGPACK else "json"
-        return data["ws"] + f"?version={self.version}&format={fmt}&token={http_handler.token}"
+        ret = data["ws"] + f"?version={self.version}"
+
+        if include_token:
+            ret += f"&token={http_handler.token}"
+        if transport_format is None:
+            transport_format = "msgpack" if _HAS_MSGPACK else "json"
+
+        ret += f"&format={transport_format}"
+        return ret
 
     async def __recv(self) -> BaseWebsocketEvent:
         websocket = self.__websocket
