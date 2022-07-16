@@ -24,6 +24,8 @@ from luster.enums import *
 from luster.exceptions import *
 from luster.file import *
 from luster.http import *
+from luster.object import *
+from luster.protocols import *
 from luster.server import *
 from luster.state import *
 from luster.users import *

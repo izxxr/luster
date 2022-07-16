@@ -9,6 +9,18 @@ Revolt API is packed with various complex data models. These classes wrap these 
 easy to use form so you don't have to worry about dealing with JSON manually, handling optional
 fields, default values etc. All of that workload is handled by the library.
 
+BaseModel
+---------
+
+.. autoclass:: BaseModel
+    :members:
+
+Object
+------
+
+.. autoclass:: Object
+    :members:
+
 File
 ----
 
