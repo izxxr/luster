@@ -249,7 +249,10 @@ class WebsocketHandler(StateManagementMixin):
             raise RuntimeError("Websocket is closed.")
 
         data.update(type=type)
-        await websocket.send_json(data)
+        if _HAS_MSGPACK:
+            await websocket.send_bytes(msgpack.packb(data))  # type: ignore
+        else:
+            await websocket.send_json(data)
 
     async def on_websocket_event(self, type: types.EventTypeRecv, data: Dict[str, Any]) -> Any:
         """A hook that gets called whenever a websocket event is received.
