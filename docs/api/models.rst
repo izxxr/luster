@@ -65,61 +65,61 @@ PartialUserBot
     :members:
 
 Server
-~~~~~~
+------
 
 .. autoclass:: Server
     :members:
 
 SystemMessages
-~~~~~~~~~~~~~~
+--------------
 
 .. autoclass:: SystemMessages
     :members:
 
 Category
-~~~~~~~~
+--------
 
 .. autoclass:: Category
     :members:
 
 ServerChannel
-~~~~~~~~~~~~~
+-------------
 
 .. autoclass:: ServerChannel
     :members:
 
 TextChannel
-~~~~~~~~~~~
+-----------
 
 .. autoclass:: TextChannel
     :members:
 
 VoiceChannel
-~~~~~~~~~~~~
+------------
 
 .. autoclass:: VoiceChannel
     :members:
 
 PrivateChannel
-~~~~~~~~~~~~~~
+--------------
 
 .. autoclass:: PrivateChannel
     :members:
 
 SavedMessages
-~~~~~~~~~~~~~
+-------------
 
 .. autoclass:: SavedMessages
     :members:
 
 DirectMessage
-~~~~~~~~~~~~~
+-------------
 
 .. autoclass:: DirectMessage
     :members:
 
 Group
-~~~~~
+-----
 
 .. autoclass:: Group
     :members:
