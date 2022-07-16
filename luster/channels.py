@@ -4,12 +4,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
 from luster.internal.mixins import StateAware
-from luster.internal.helpers import MISSING, upsert_remove_value
+from luster.internal.helpers import MISSING, get_attachment_id, upsert_remove_value
 from luster.enums import ChannelType
 from luster.file import File
 from luster.users import User
 
 if TYPE_CHECKING:
+    from io import BufferedReader
     from luster.server import Server
     from luster.state import State
     from luster import types
@@ -54,7 +55,7 @@ class _EditChannelMixin(StateAware):
         *,
         name: str = MISSING,
         description: Optional[str] = MISSING,
-        icon: Optional[str] = MISSING,
+        icon: Optional[Union[str, BufferedReader]] = MISSING,
         nsfw: bool = MISSING,
     ) -> None:
         """Edits the channel.
@@ -77,6 +78,7 @@ class _EditChannelMixin(StateAware):
             Whether this channel is marked as NSFW.
         """
         json = {}
+        http = self._state.http_handler
 
         if name:
             json["name"] = name
@@ -91,14 +93,14 @@ class _EditChannelMixin(StateAware):
             if icon is None:
                 upsert_remove_value(json, "Icon")
             else:
-                json["icon"] = icon
+                json["icon"] = await get_attachment_id(http, icon, "icons")
 
         if nsfw is not MISSING:
             json["nsfw"] = nsfw
 
         if json:
             # data is equivalent to types.EditChannelJSON now
-            data = await self._state.http_handler.edit_channel(self.id, json=json)  # type: ignore
+            data = await http.edit_channel(self.id, json=json)  # type: ignore
 
             # self.__class__ will resolve to a valid channel type
             return self.__class__(data, self._state)  # type: ignore
