@@ -22,6 +22,7 @@ __all__ = (
     "SavedMessages",
     "DirectMessage",
     "Group",
+    "Category",
 )
 
 
@@ -393,3 +394,50 @@ class Group(PrivateChannel, _EditChannelMixin):
         state = self._state
         data = await state.http_handler.fetch_user(self.owner_id)
         return User(data, state)
+
+
+class Category(StateAware):
+    """Represents a category for other channels.
+
+    Attributes
+    ----------
+    id: :class:`str`
+        The ID of this category.
+    title: :class:`str`
+        The title of this category.
+    channel_ids: List[:class:`str`]
+        The list of channel IDs that are in this category.
+    """
+
+    if TYPE_CHECKING:
+        id: str
+        title: str
+        channel_ids: List[str]
+
+    def __init__(self, data: types.Category, state: State) -> None:
+        self._state = state
+        self._update_from_data(data)
+
+    def _update_from_data(self, data: types.Category):
+        self.id = data["id"]
+        self.title = data["title"]
+        self.channel_ids = data.get("channels", [])
+
+    def channels(self) -> List[ServerChannel]:
+        """The list of channels in this category.
+
+        Returns
+        -------
+        List[:class:`ServerChannel`]
+            The channels associated to this category.
+        """
+        ret: List[ServerChannel] = []
+        cache = self._state.cache
+
+        for channel_id in self.channel_ids:
+            channel = cache.get_channel(channel_id)
+            if channel:
+                # Should always be a ServerChannel
+                ret.append(channel)  # type: ignore
+
+        return ret

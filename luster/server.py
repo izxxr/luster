@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional
 from luster.internal.helpers import handle_optional_field
 from luster.internal.mixins import StateAware
+from luster.channels import Category
 from luster.file import File
 from luster.system_messages import SystemMessages
 
@@ -47,6 +48,8 @@ class Server(StateAware):
         Whether this server has enabled analytics data.
     system_messages: :class:`SystemMessages`
         The system messages channels assignments.
+    categories: List[:class:`Category`]
+        The list of categories associated to this server.
     """
 
     if TYPE_CHECKING:
@@ -62,6 +65,7 @@ class Server(StateAware):
         icon: Optional[File]
         banner: Optional[File]
         system_messages: SystemMessages
+        categories: List[Category]
 
     __slots__ = (
         "_state",
@@ -77,6 +81,7 @@ class Server(StateAware):
         "icon",
         "banner",
         "system_messages",
+        "categories",
     )
 
     def __init__(self, data: types.Server, state: State) -> None:
@@ -94,6 +99,7 @@ class Server(StateAware):
         self.nsfw = data.get("nsfw", False)
         self.discoverable = data.get("discoverable", False)
         self.analytics = data.get("analytics", False)
+        self.categories = [Category(c, self._state) for c in handle_optional_field(data, "categories", [], None)]
 
         icon = data.get("icon")
         banner = data.get("banner")

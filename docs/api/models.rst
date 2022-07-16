@@ -76,6 +76,12 @@ SystemMessages
 .. autoclass:: SystemMessages
     :members:
 
+Category
+~~~~~~~~
+
+.. autoclass:: Category
+    :members:
+
 ServerChannel
 ~~~~~~~~~~~~~
 
