@@ -160,6 +160,18 @@ class Client(ListenersMixin):
         """
         return self.__cache
 
+    @property
+    def latency(self) -> float:
+        """The websocket latency.
+
+        A shorthand for :attr:`WebsocketHandler.latency`.
+
+        Returns
+        -------
+        :class:`float`
+        """
+        return self.__websocket_handler.latency
+
     def listen(self, event: types.EventTypeRecv) -> Callable[[Listener[BE]], Listener[BE]]:
         """A decorator for registering an event listener.
 
