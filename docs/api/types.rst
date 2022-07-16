@@ -512,13 +512,13 @@ UserRelationshipEvent
 ServerCreateEvent
 ~~~~~~~~~~~~~~~~~
 
-.. autoclass:: ServerCreate()
+.. autoclass:: ServerCreateEvent()
     :members:
 
 ServerUpdateEvent
 ~~~~~~~~~~~~~~~~~
 
-.. autoclass:: ServerUpdate()
+.. autoclass:: ServerUpdateEvent()
     :members:
 
 ServerUpdateEventData
