@@ -451,6 +451,105 @@ class HTTPHandler(StateManagementMixin):
         data = await self.request("GET", f"/users/{user_id}/profile")
         return data
 
+    # Servers
+
+    async def create_server(self, json: types.CreateServerChannelJSON) -> types.CreateServerChannelResponse:
+        """Creates a new server.
+
+        Parameters
+        ----------
+        json: :class:`types.CreateServerChannelJSON`
+            The JSON body for request.
+
+        Returns
+        -------
+        :class:`types.CreateServerChannelResponse`
+        """
+        data = await self.request("POST", "/servers/create", json=json)
+        return data
+
+    async def fetch_server(self, server_id: str) -> types.FetchServerResponse:
+        """Fetches a server.
+
+        Parameters
+        ----------
+        server_id: :class:`str`
+            The ID of server to fetch.
+
+        Returns
+        -------
+        :class:`types.FetchServerResponse`
+        """
+        data = await self.request("GET", f"/servers/{server_id}")
+        return data
+
+    async def delete_server(self, server_id: str) -> types.DeleteChannelResponse:
+        """Deletes a server.
+
+        If the requesting user is not the server owner, The server
+        is left by the user.
+
+        Parameters
+        ----------
+        server_id: :class:`str`
+            The ID of server to delete.
+
+        Returns
+        -------
+        :class:`types.DeleteChannelResponse`
+        """
+        data = await self.request("DELETE", f"/servers/{server_id}")
+        return data
+
+    async def edit_server(self, server_id: str, json: types.EditServerJSON) -> types.EditServerResponse:
+        """Edits a server.
+
+        Parameters
+        ----------
+        server_id: :class:`str`
+            The ID of server to edit.
+        json: :class:`types.EditServerJSON`
+            The JSON body for request.
+
+        Returns
+        -------
+        :class:`types.EditServerResponse`
+        """
+        data = await self.request("PATCH", f"/servers/{server_id}", json=json)
+        return data
+
+    async def mark_server_as_read(self, server_id: str) -> types.MarkServerAsReadResponse:
+        """Marks a server as read.
+
+        Parameters
+        ----------
+        server_id: :class:`str`
+            The ID of server to mark as read.
+
+        Returns
+        -------
+        :class:`types.MarkServerAsReadResponse`
+        """
+        data = await self.request("PUT", f"/servers/{server_id}/ack")
+        return data
+
+    async def create_server_channel(self, server_id: str, json: types.CreateServerChannelJSON) -> types.CreateServerChannelResponse:
+        """Creates a channel in a server.
+
+        Parameters
+        ----------
+        server_id: :class:`str`
+            The ID of server to create the channel in.
+        json: :class:`types.CreateServerChannelJSON`
+            The JSON body for request.
+
+        Returns
+        -------
+        :class:`types.CreateServerChannelResponse`
+        """
+        data = await self.request("POST", f"/servers/{server_id}/channels", json=json)
+        return data
+
     # Channels
 
     async def fetch_direct_message_channels(self) -> types.FetchDirectMessageChannelsResponse:

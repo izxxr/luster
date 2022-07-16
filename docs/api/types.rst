@@ -79,6 +79,9 @@ This section documents various enumerations from the Revolt API. All these are t
 
     The fields that can be removed from channel object by editing it.
 
+.. data:: ServerRemoveField
+
+    The fields that can be removed from server object by editing it.
 
 API Models
 ----------
@@ -309,6 +312,64 @@ UploadFileResponse
 
 .. autoclass:: UploadFileResponse()
     :members:
+
+CreateServerJSON
+~~~~~~~~~~~~~~~~
+
+.. autoclass:: CreateServerJSON()
+    :members:
+
+CreateServerResponse
+~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: CreateServerResponse()
+    :members:
+
+FetchServerResponse
+~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: FetchServerResponse()
+    :members:
+
+EditServerJSON
+~~~~~~~~~~~~~~
+
+.. autoclass:: EditServerJSON()
+    :members:
+
+EditServerResponse
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: EditServerResponse()
+    :members:
+
+DeleteServerResponse
+~~~~~~~~~~~~~~~~~~~~
+
+.. data:: DeleteServerResponse
+
+    A type alias representing response of :meth:`luster.HTTPHandler.delete_server` route.
+
+MarkServerAsReadResponse
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: MarkServerAsReadResponse
+
+    A type alias representing response of :meth:`luster.HTTPHandler.mark_server_as_read` route.
+
+CreateServerChannelJSON
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: CreateServerChannelJSON()
+    :members:
+
+CreateServerChannelResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: CreateServerChannelResponse
+
+    A type alias representing response of :meth:`luster.HTTPHandler.create_server_channel` route.
+
 
 FetchDirectMessageChannelsResponse
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
