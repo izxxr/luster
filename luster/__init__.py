@@ -28,5 +28,6 @@ from luster.object import *
 from luster.protocols import *
 from luster.server import *
 from luster.state import *
+from luster.system_messages import *
 from luster.users import *
 from luster.websocket import *
