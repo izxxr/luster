@@ -221,7 +221,7 @@ VoiceChannel
     :members:
 
 ServerChannel
-~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. data:: ServerChannel
 
