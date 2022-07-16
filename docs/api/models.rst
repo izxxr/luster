@@ -70,6 +70,12 @@ Server
 .. autoclass:: Server
     :members:
 
+SystemMessages
+~~~~~~~~~~~~~~
+
+.. autoclass:: SystemMessages
+    :members:
+
 ServerChannel
 ~~~~~~~~~~~~~
 

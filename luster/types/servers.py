@@ -31,16 +31,16 @@ __all__ = (
 class SystemMessages(TypedDict):
     """Represents the system messages channels in a :class:`Server`."""
 
-    user_joined: str
+    user_joined: NotRequired[Optional[str]]
     """The ID of channel in which message is sent when a user joins."""
 
-    user_left: str
+    user_left: NotRequired[Optional[str]]
     """The ID of channel in which message is sent when a user leaves."""
 
-    user_kicked: str
+    user_kicked: NotRequired[Optional[str]]
     """The ID of channel in which message is sent when a user is kicked."""
 
-    user_banned: str
+    user_banned: NotRequired[Optional[str]]
     """The ID of channel in which message is sent when a user is banned."""
 
 

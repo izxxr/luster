@@ -119,7 +119,7 @@ class ListenersMixin(ABC):
         """
         handler = self._get_events_handler()
         return handler.listeners.pop(event, [])
-    
+
     def remove_listener(self, event: EventTypeRecv, callback: Listener[Any]) -> bool:
         """Removes an event listener for the given event.
 
@@ -264,13 +264,13 @@ class EventsHandler(ListenersMixin):
                 if client:
                     client.user = obj
 
-        for server in servers:
-            state.cache.add_server(Server(server, state))
-
         for channel in channels:
             cls = channel_factory(channel["channel_type"])
             # Type checker fails to resolve signature of cls
             state.cache.add_channel(cls(channel, state))  # type: ignore
+
+        for server in servers:
+            state.cache.add_server(Server(server, state))
 
         _LOGGER.info("Successfully cached the entities.")
 
