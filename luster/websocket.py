@@ -62,11 +62,13 @@ class WebsocketHandler(StateManagementMixin):
         self.version = version
         self.__http_handler = http_handler
         self.__events_handler: Optional[EventsHandler] = None
+        self.__latency = float("inf")
 
         # Connection state related data
         self.__closed: bool = True
         self.__websocket: Optional[ClientWebSocketResponse] = None
         self.__ping_task: Optional[asyncio.Task[None]] = None
+        self.__ping_ack_received = asyncio.Event()
 
         if not _HAS_MSGPACK:
             _LOGGER.warning("It is recommended to install msgpack that enables faster websockets packets parsing.")
@@ -75,6 +77,7 @@ class WebsocketHandler(StateManagementMixin):
         self.__closed = True
         self.__websocket = None
         self.__ping_task = None
+        self.__ping_ack_received.clear()
 
     def set_events_handler(self, handler: EventsHandler) -> None:
         self.__events_handler = handler
@@ -107,6 +110,19 @@ class WebsocketHandler(StateManagementMixin):
         :class:`bool`
         """
         return self.__closed
+
+    @property
+    def latency(self) -> float:
+        """The current latency of websocket.
+
+        This is measured by delay between ping sent by
+        client and it's acknowledgement by the server.
+
+        Returns
+        -------
+        :class:`float`
+        """
+        return self.__latency
 
     async def get_websocket_url(
         self,
@@ -178,7 +194,7 @@ class WebsocketHandler(StateManagementMixin):
             self.__ping_task = asyncio.create_task(self.__ping_task_impl(), name="luster:ping-task")
 
         elif type == "Pong":
-            _LOGGER.debug("Ping has been acknowledged. %r", data)
+            self.__ping_ack_received.set()
 
         handler = self.__events_handler
         if handler:
@@ -190,10 +206,30 @@ class WebsocketHandler(StateManagementMixin):
             raise RuntimeError("Websocket is closed.")
 
         interval = random.randint(10, 30)
-        _LOGGER.info("Pinging the websocket (interval: %rs)", interval)
+        waiter = self.__ping_ack_received
+        waiter.clear()
+
+        _LOGGER.info("Pinging the websocket with interval of %rs", interval)
 
         while not self.__closed:
-            await self.send("Ping", {"data": int(time.time())})
+            sent_at = time.time()
+            _LOGGER.debug("Pinging websocket (timestamp: %r)", sent_at)
+
+            await self.send("Ping", {"data": int(sent_at)})
+
+            try:
+                await asyncio.wait_for(waiter.wait(), timeout=interval)
+            except asyncio.TimeoutError:
+                _LOGGER.warning(f"Timed out waiting for a ping acknowledgement. (timestamp: {sent_at})")
+            else:
+                waiter.clear()
+                latency = time.time() - sent_at
+
+                _LOGGER.debug("Received the ping acknowledgment in %rms (timestamp: %r)",
+                              round(latency * 1000), sent_at)
+
+                self.__latency = latency
+
             await asyncio.sleep(interval)
 
     async def __call_recv_hook(self, type: types.EventTypeRecv, data: Dict[str, Any]) -> None:

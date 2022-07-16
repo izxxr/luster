@@ -231,11 +231,7 @@ class EventsHandler(ListenersMixin):
 
     @event_handler("Pong")
     async def on_pong(self, data: types.PongEvent) -> None:
-        # TODO: Revolt API currently does not send a PONG event for
-        # some reason and I suspect that's a bug.
         inner = data["data"]
-        _LOGGER.debug("Ping has been acknowledged. (ts: %r)", inner)
-
         event = events.Pong(data=inner)
         self.call_listeners(event)
 
