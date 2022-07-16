@@ -11,10 +11,10 @@ from typing import (
     TYPE_CHECKING,
 )
 from typing_extensions import NotRequired
-from luster.types.channels import Channel
+from luster.types.channels import Category, Channel, ServerChannel
 from luster.types.file import File
 from luster.types.users import Profile, Status, User
-from luster.types.servers import Server
+from luster.types.servers import Server, SystemMessages
 
 
 if TYPE_CHECKING:
@@ -22,7 +22,8 @@ if TYPE_CHECKING:
         EventTypeRecv,
         ErrorId,
         UserRemoveField,
-        RelationshipStatus
+        RelationshipStatus,
+        ServerRemoveField,
     )
 
 
@@ -42,6 +43,10 @@ __all__ = (
     "UserUpdateEvent",
     "UserUpdateEventData",
     "UserRelationshipEvent",
+    "ServerCreateEvent",
+    "ServerUpdateEvent",
+    "ServerUpdateEventData",
+    "ServerDeleteEvent",
 )
 
 class BaseWebsocketEvent(TypedDict):
@@ -208,3 +213,79 @@ class UserRelationshipEvent(TypedDict):
 
     status: RelationshipStatus
     """The new relationship status."""
+
+
+class ServerCreateEvent(TypedDict):
+    """Represents an event indicating creation/joining of a server."""
+
+    type: Literal["ServerCreate"]
+    """The type of event."""
+
+    id: str
+    """The ID of joined server."""
+
+    server: Server
+    """The joined server."""
+
+    channels: List[ServerChannel]
+    """The channels of this server."""
+
+
+class ServerDeleteEvent(TypedDict):
+    """Represents an event indicating deletion/leaving of a server."""
+
+    type: Literal["ServerDelete"]
+    """The type of event."""
+
+    id: str
+    """The ID of server that was deleted/left."""
+
+class ServerUpdateEventData(TypedDict, total=False):
+    """Represents the data inside a :class:`ServerUpdateEvent`.
+
+    This is equivalent to a "partial" server. All the fields
+    in this type are optional.
+    """
+
+    name: str
+    """The name of user."""
+
+    description: str
+    """The description of server."""
+
+    categories: List[Category]
+    """The categories of server."""
+
+    system_messages: SystemMessages
+    """The channel assignments for system messages in the server."""
+
+    icon: File
+    """The icon of user."""
+
+    banner: File
+    """The banner of server."""
+
+    nsfw: bool
+    """Whether this server is marked as NSFW."""
+
+    analytics: bool
+    """Whether analytics are enabled for this server."""
+
+    discoverable: bool
+    """Whether this server is discoverable."""
+
+
+class ServerUpdateEvent(TypedDict):
+    """Represents an event indicating update of a server."""
+
+    type: Literal["ServerUpdate"]
+    """The type of event."""
+
+    id: str
+    """The ID of server that was updated."""
+
+    data: ServerUpdateEventData
+    """The partial server object representing the details that were updated."""
+
+    clear: List[ServerRemoveField]
+    """The fields removed from server object."""

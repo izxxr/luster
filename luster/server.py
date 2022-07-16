@@ -3,8 +3,15 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, List, Literal, Optional, Union, overload
-from luster.internal.helpers import MISSING, get_attachment_id, handle_optional_field, upsert_remove_value
+from luster.internal.helpers import (
+    MISSING,
+    get_attachment_id,
+    handle_optional_field,
+    upsert_remove_value,
+)
+from luster.internal.update_handler import UpdateHandler, handle_update
 from luster.internal.mixins import StateAware
+from luster.types.websocket import ServerUpdateEventData
 from luster.channels import Category, channel_factory
 from luster.file import File
 from luster.system_messages import SystemMessages
@@ -20,7 +27,7 @@ __all__ = (
 )
 
 
-class Server(StateAware):
+class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
     """Represents a Revolt server.
 
     Attributes
@@ -109,6 +116,55 @@ class Server(StateAware):
         self.icon = File(icon, self._state) if icon else None
         self.banner = File(banner, self._state) if banner else None
         self.system_messages = SystemMessages.from_dict(system_messages, state=self._state)
+
+    def handle_field_removals(self, fields: List[types.ServerRemoveField]) -> None:
+        for field in fields:
+            if field == "Icon":
+                self.icon = None
+            elif field == "Banner":
+                self.banner = None
+            elif field == "Description":
+                self.description = None
+            elif field == "SystemMessages":
+                self.system_messages = SystemMessages()
+            elif field == "Categories":
+                self.categories = []
+
+    @handle_update("name")
+    def _handle_update_name(self, new: str) -> None:
+        self.name = new
+
+    @handle_update("description")
+    def _handle_update_description(self, new: str) -> None:
+        self.description = new
+
+    @handle_update("categories")
+    def _handle_update_categories(self, new: List[types.Category]) -> None:
+        self.categories = [Category(c, self._state) for c in new]
+
+    @handle_update("system_messages")
+    def _handle_update_system_messages(self, new: types.SystemMessages) -> None:
+        self.system_messages = SystemMessages.from_dict(new, state=self._state)
+
+    @handle_update("icon")
+    def _handle_update_icon(self, new: types.File) -> None:
+        self.icon = File(new, self._state)
+
+    @handle_update("banner")
+    def _handle_update_banner(self, new: types.File) -> None:
+        self.banner = File(new, self._state)
+
+    @handle_update("analytics")
+    def _handle_update_analytics(self, new: bool) -> None:
+        self.analytics = new
+
+    @handle_update("discoverable")
+    def _handle_update_discoverable(self, new: bool) -> None:
+        self.discoverable = new
+
+    @handle_update("nsfw")
+    def _handle_update_nsfw(self, new: bool) -> None:
+        self.nsfw = new
 
     def channels(self) -> List[ServerChannel]:
         """The list of channels in this server.

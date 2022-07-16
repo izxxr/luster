@@ -87,3 +87,21 @@ UserRelationshipUpdate
 
 .. autoclass:: UserRelationshipUpdate
     :members:
+
+ServerCreate
+~~~~~~~~~~~~
+
+.. autoclass:: ServerCreate
+    :members:
+
+ServerUpdate
+~~~~~~~~~~~~
+
+.. autoclass:: ServerUpdate
+    :members:
+
+ServerDelete
+~~~~~~~~~~~~
+
+.. autoclass:: ServerDelete
+    :members:

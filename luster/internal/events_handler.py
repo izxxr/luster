@@ -28,6 +28,7 @@ import traceback
 
 if TYPE_CHECKING:
     from luster.types.websocket import EventTypeRecv
+    from luster.channels import ServerChannel
     from luster.events import BaseEvent
     from luster.state import State
     from luster import types
@@ -280,7 +281,7 @@ class EventsHandler(ListenersMixin):
         user = state.cache.get_user(user_id)
 
         if user is None:
-            _LOGGER.debug("(Event: UserUpdate) User %r is not cached.", user_id)
+            _LOGGER.debug("(UserUpdate) User %r is not cached.", user_id)
             return
 
         before = copy.copy(user)
@@ -314,4 +315,56 @@ class EventsHandler(ListenersMixin):
         after = Relationship({"_id": user.id, "status": data["status"]}, user)  # type: ignore
 
         event = events.UserRelationship(before=before, after=after)
+        self.call_listeners(event)
+
+    @event_handler("ServerCreate")
+    async def on_server_create(self, data: types.ServerCreateEvent) -> None:
+        state = self._state
+        cache = state.cache
+
+        server = Server(data["server"], self._state)
+
+        for payload in data.get("channels", []):
+            cls = channel_factory(payload["channel_type"])
+            cache.add_channel(cls(payload, state))  # type: ignore
+
+        event = events.ServerCreate(server=server)
+
+        self._state.cache.add_server(server)
+        self.call_listeners(event)
+
+    @event_handler("ServerUpdate")
+    async def on_server_update(self, data: types.ServerUpdateEvent) -> None:
+        server_id = data["id"]
+        server = self._state.cache.get_server(server_id)
+
+        if server is None:
+            _LOGGER.debug("(ServerUpdate) Server %r is not cached.", server_id)
+            return
+
+        before = copy.copy(server)
+        event = events.ServerUpdate(before=before, after=server)
+
+        server.handle_field_removals(data.get("clear", []))
+        server.update(data["data"])
+        self.call_listeners(event)
+
+
+    @event_handler("ServerDelete")
+    async def on_server_delete(self, data: types.ServerDeleteEvent) -> None:
+        cache = self._state.cache
+        server_id = data["id"]
+        server = cache.remove_server(server_id)
+
+        if server is None:
+            _LOGGER.debug("(ServerDelete) Server %r is not cached.", server_id)
+            return
+
+        channels: List[ServerChannel] = []
+        for channel_id in server.channel_ids:
+            channel = cache.remove_channel(channel_id)
+            if channel:
+                channels.append(channel)  # type: ignore
+
+        event = events.ServerDelete(server=server, channels=channels)
         self.call_listeners(event)

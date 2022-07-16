@@ -33,6 +33,15 @@ class WebsocketEvent:
     USER_RELATIONSHIP_UPDATE = USER_RELATIONSHIP
     """An alias for :attr:`.USER_RELATIONSHIP`."""
 
+    SERVER_CREATE = "ServerCreate"
+    """This event is emitted when a server is created/joined by our user."""
+
+    SERVER_UPDATE = "ServerUpdate"
+    """This event is emitted when a server is updated."""
+
+    SERVER_DELETE = "ServerDelete"
+    """This event is emitted when a server is deleted by our user."""
+
 
 class FileType:
     """An enumeration detailing the values for type of a :class:`File`."""

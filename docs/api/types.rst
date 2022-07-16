@@ -508,3 +508,27 @@ UserRelationshipEvent
 
 .. autoclass:: UserRelationshipEvent()
     :members:
+
+ServerCreateEvent
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerCreate()
+    :members:
+
+ServerUpdateEvent
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerUpdate()
+    :members:
+
+ServerUpdateEventData
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerUpdateEventData()
+    :members:
+
+ServerDeleteEvent
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerDeleteEvent()
+    :members:
