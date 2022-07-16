@@ -172,5 +172,5 @@ class CreateServerChannelJSON(TypedDict):
     description: NotRequired[Optional[str]]
     """The description/topic of channel."""
 
-    nsfw: bool
+    nsfw: NotRequired[bool]
     """Whether to mark channel as NSFW."""

@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional
-from luster.internal.helpers import handle_optional_field
+from typing import TYPE_CHECKING, List, Literal, Optional, Union, overload
+from luster.internal.helpers import MISSING, get_attachment_id, handle_optional_field, upsert_remove_value
 from luster.internal.mixins import StateAware
-from luster.channels import Category
+from luster.channels import Category, channel_factory
 from luster.file import File
 from luster.system_messages import SystemMessages
 
 if TYPE_CHECKING:
-    from luster.channels import ServerChannel
+    from io import BufferedReader
+    from luster.channels import ServerChannel, TextChannel, VoiceChannel
     from luster.state import State
     from luster import types
 
@@ -126,3 +127,177 @@ class Server(StateAware):
                 channels.append(channel)  # type: ignore
 
         return channels
+
+    async def edit(
+        self,
+        *,
+        name: str = MISSING,
+        description: Optional[str] = MISSING,
+        icon: Optional[Union[str, BufferedReader]] = MISSING,
+        banner: Optional[Union[str, BufferedReader]] = MISSING,
+        system_messages: SystemMessages = MISSING,
+        analytics: bool = MISSING,
+    ) -> Server:
+        """Edits the server.
+
+        This requires the :attr:`~Permissions.manage_server` permission
+        in the server.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of server.
+        description: Optional[:class:`str`]
+            The description of server. Passing ``None`` removes the existing
+            description of server.
+        icon: Optional[Union[:class:`str`, :class:`io.BufferedReader`]]
+            The icon of server. Passing ``None`` removes the icon.
+            |attachment-parameter-note|
+        banner: Optional[Union[:class:`str`, :class:`io.BufferedReader`]]
+            The banner of server. Passing ``None`` removes the banner.
+            |attachment-parameter-note|
+        system_messages: Optional[:class:`SystemMessages`]
+            The system messages channels of the server.
+        analytics: :class:`bool`
+            Whether to enable analytics data for this server.
+
+        Returns
+        -------
+        :class:`Server`
+            The updated server.
+
+        Raises
+        ------
+        HTTPForbidden
+            Missing permissions.
+        HTTPException
+            The editing failed.
+        """
+        json: types.EditServerJSON = {}
+        http = self._state.http_handler
+
+        if name is not MISSING:
+            json["name"] = name
+
+        if description is not MISSING:
+            if description is None:
+                upsert_remove_value(json, "Description")
+            else:
+                json["description"] = description
+
+        if icon is not MISSING:
+            if icon is None:
+                upsert_remove_value(json, "Icon")
+            else:
+                json["icon"] = await get_attachment_id(http, icon, "icons")
+
+        if banner is not MISSING:
+            if banner is None:
+                upsert_remove_value(json, "Banner")
+            else:
+                json["banner"] = await get_attachment_id(http, banner, "banners")
+
+        if system_messages is not MISSING:
+            json["system_messages"] = system_messages.to_dict()
+
+        if analytics is not MISSING:
+            json["analytics"] = analytics
+
+        data = await http.edit_server(self.id, json)
+        return Server(data, self._state)
+
+    async def delete(self) -> None:
+        """Deletes or leaves the server.
+
+        If you own the server, this method deletes it otherwise
+        leaves it.
+
+        Raises
+        ------
+        HTTPException
+            The request failed.
+        """
+        await self._state.http_handler.delete_server(self.id)
+
+    async def mark_read(self) -> None:
+        """Marks this server as read.
+
+        Raises
+        ------
+        HTTPException
+            The request failed.
+        """
+        await self._state.http_handler.mark_server_as_read(self.id)
+
+    @overload
+    async def create_channel(
+        self,
+        *,
+        name: str,
+        type: Literal["TextChannel"],
+        description: str = ...,
+        nsfw: bool = ...,
+    ) -> TextChannel:
+        ...
+
+    @overload
+    async def create_channel(
+        self,
+        *,
+        name: str,
+        type: Literal["VoiceChannel"],
+        description: str = ...,
+        nsfw: bool = ...,
+    ) -> VoiceChannel:
+        ...
+
+    async def create_channel(
+        self,
+        *,
+        name: str,
+        type: types.ChannelTypeServer,
+        description: str = MISSING,
+        nsfw: bool = MISSING, 
+    ) -> ServerChannel:
+        """Creates a channel in this server.
+
+        This operation requires :attr:`~Permissions.manage_channels`
+        permission in the server.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of channel.
+        type: :class:`types.ChannelTypeServer`
+            The type of channel.
+        description: :class:`str`
+            The description of channel.
+        nsfw: :class:`bool`
+            Whether to mark the channel as NSFW.
+
+        Returns
+        -------
+        :class:`ServerChannel`
+            The created channel.
+
+        Raises
+        ------
+        HTTPForbidden
+            You are not allowed to do this.
+        HTTPException
+            The request failed.
+        """
+        json: types.CreateServerChannelJSON = {
+            "name": name,
+            "channel_type": type,
+        }
+
+        if description is not MISSING:
+            json["description"] = description
+        if nsfw is not MISSING:
+            json["nsfw"] = nsfw
+
+        data = await self._state.http_handler.create_server_channel(self.id, json)
+        cls = channel_factory(data["channel_type"])
+        # cls should always be Type[ServerChannel]
+        return cls(data, self._state)  # type: ignore

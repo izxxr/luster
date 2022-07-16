@@ -13,12 +13,14 @@ from typing import (
 from typing_extensions import Self
 from luster.internal.events_handler import BE, EventsHandler, ListenersMixin, Listener
 from luster.http import create_http_handler, HTTPHandler
+from luster.internal.helpers import MISSING
 from luster.websocket import WebsocketHandler
 from luster.cache import Cache
 from luster.state import State
 from luster.users import User
 from luster.file import PartialUploadedFile
 from luster.channels import ChannelT, channel_factory
+from luster.server import Server
 
 import asyncio
 
@@ -366,3 +368,68 @@ class Client(ListenersMixin):
             ret.append(cls(item, self.__state))  # type: ignore
 
         return ret
+
+    # Servers
+
+    async def fetch_server(self, server_id: str) -> Server:
+        """Fetches a server via it's ID.
+
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The ID of channel to fetch.
+
+        Returns
+        -------
+        :class:`Server`
+            The requested server.
+
+        Raises
+        ------
+        HTTPNotFound
+            The server does not exist.
+        HTTPException
+            Fetching of server failed.
+        """
+        data = await self.__http_handler.fetch_server(server_id)
+        return Server(data, self.__state)
+
+    async def create_server(
+        self,
+        *,
+        name: str,
+        description: str = MISSING,
+        nsfw: bool = MISSING,
+    ) -> Server:
+        """Creates a server.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of server.
+        description: :class:`str`
+            The description of server.
+        nsfw: :class:`bool`
+            Whether this server is NSFW.
+
+        Returns
+        -------
+        :class:`Server`
+            The created server.
+
+        Raises
+        ------
+        HTTPException
+            Creation of server failed.
+        """
+        json: types.CreateServerJSON = {
+            "name": name,
+        }
+
+        if description is not MISSING:
+            json["description"] = description
+        if nsfw is not MISSING:
+            json["nsfw"] = nsfw
+
+        data = await self.__http_handler.create_server(json=json)
+        return Server(data, self.__state)

@@ -453,17 +453,17 @@ class HTTPHandler(StateManagementMixin):
 
     # Servers
 
-    async def create_server(self, json: types.CreateServerChannelJSON) -> types.CreateServerChannelResponse:
+    async def create_server(self, json: types.CreateServerJSON) -> types.CreateServerResponse:
         """Creates a new server.
 
         Parameters
         ----------
-        json: :class:`types.CreateServerChannelJSON`
+        json: :class:`types.CreateServerJSON`
             The JSON body for request.
 
         Returns
         -------
-        :class:`types.CreateServerChannelResponse`
+        :class:`types.CreateServerResponse`
         """
         data = await self.request("POST", "/servers/create", json=json)
         return data
