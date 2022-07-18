@@ -8,6 +8,7 @@ __all__ = (
     "RelationshipStatus",
     "PresenceType",
     "FileTag",
+    "ChannelType",
 )
 
 
@@ -31,6 +32,24 @@ class WebsocketEvent:
 
     USER_RELATIONSHIP_UPDATE = USER_RELATIONSHIP
     """An alias for :attr:`.USER_RELATIONSHIP`."""
+
+    SERVER_CREATE = "ServerCreate"
+    """This event is emitted when a server is created/joined by our user."""
+
+    SERVER_UPDATE = "ServerUpdate"
+    """This event is emitted when a server is updated."""
+
+    SERVER_DELETE = "ServerDelete"
+    """This event is emitted when a server is deleted by our user."""
+
+    CHANNEL_CREATE = "ChannelCreate"
+    """This event is emitted when a channel is created."""
+
+    CHANNEL_UPDATE = "ChannelUpdate"
+    """This event is emitted when a channel is updated."""
+
+    CHANNEL_DELETE = "ChannelDelete"
+    """This event is emitted when a channel is deleted."""
 
 
 class FileType:
@@ -101,3 +120,22 @@ class FileTag:
 
     ICONS = "icons"
     """The file is an icon."""
+
+
+class ChannelType:
+    """An enumeration detailing values for a channel :attr:`~ServerChannel.type`."""
+
+    SAVED_MESSAGES = "SavedMessages"
+    """Saved notes channel."""
+
+    DIRECT_MESSAGE = "DirectMessage"
+    """A DM channel between two users."""
+
+    GROUP = "Group"
+    """A private group between several users."""
+
+    TEXT_CHANNEL = "TextChannel"
+    """A text channel belonging to a server."""
+
+    VOICE_CHANNEL = "VoiceChannel"
+    """A voice channel belonging to a server."""

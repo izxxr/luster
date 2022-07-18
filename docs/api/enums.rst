@@ -37,3 +37,9 @@ PresenceType
 
 .. autoclass:: PresenceType
     :members:
+
+ChannelType
+-----------
+
+.. autoclass:: ChannelType
+    :members:

@@ -7,6 +7,8 @@ from luster.internal.mixins import StateManagementMixin
 
 if TYPE_CHECKING:
     from luster.users import User
+    from luster.server import Server
+    from luster.channels import ChannelT
 
 
 class Cache(StateManagementMixin):
@@ -27,6 +29,8 @@ class Cache(StateManagementMixin):
 
     def clear(self) -> None:
         self.__users: Dict[str, User] = {}
+        self.__servers: Dict[str, Server] = {}
+        self.__channels: Dict[str, ChannelT] = {}
 
     def users(self) -> List[User]:
         """The users that are currently cached.
@@ -54,7 +58,7 @@ class Cache(StateManagementMixin):
 
         Parameters
         ----------
-        user_id: :class:`User`
+        user_id: :class:`str`
             The ID of user to get.
 
         Returns
@@ -69,7 +73,7 @@ class Cache(StateManagementMixin):
 
         Parameters
         ----------
-        user_id: :class:`User`
+        user_id: :class:`str`
             The ID of user to remove.
 
         Returns
@@ -78,3 +82,105 @@ class Cache(StateManagementMixin):
             The remoevd user; if exists. Otherwise ``None``.
         """
         return self.__users.pop(user_id, None)
+
+    def servers(self) -> List[Server]:
+        """The servers that are currently cached.
+
+        Returns
+        -------
+        List[:class:`Server`]
+        """
+        return list(self.__servers.values())
+
+    def add_server(self, server: Server) -> None:
+        """Adds a new server to the cache.
+
+        If a similar server already exists, It will be overwritten.
+
+        Parameters
+        ----------
+        server: :class:`Server`
+            The server to add.
+        """
+        self.__servers[server.id] = server
+
+    def get_server(self, server_id: str) -> Optional[Server]:
+        """Gets a server from the cache.
+
+        Parameters
+        ----------
+        server_id: :class:`str`
+            The ID of server to get.
+
+        Returns
+        -------
+        Optional[:class:`Server`]
+            The requested server; if exists. Otherwise ``None``.
+        """
+        return self.__servers.get(server_id)
+
+    def remove_server(self, server_id: str) -> Optional[Server]:
+        """Removes a server from the cache.
+
+        Parameters
+        ----------
+        server_id: :class:`str`
+            The ID of server to remove.
+
+        Returns
+        -------
+        Optional[:class:`Server`]
+            The remoevd server; if exists. Otherwise ``None``.
+        """
+        return self.__servers.pop(server_id, None)
+
+    def channels(self) -> List[ChannelT]:
+        """The channels that are currently cached.
+
+        Returns
+        -------
+        List[Union[:class:`ServerChannel`, :class:`PrivateChannel`]]
+        """
+        return list(self.__channels.values())
+
+    def add_channel(self, channel: ChannelT) -> None:
+        """Adds a new channel to the cache.
+
+        If a similar channel already exists, It will be overwritten.
+
+        Parameters
+        ----------
+        channel: Union[:class:`ServerChannel`, :class:`PrivateChannel`]
+            The channel to add.
+        """
+        self.__channels[channel.id] = channel
+
+    def get_channel(self, channel_id: str) -> Optional[ChannelT]:
+        """Gets a channel from the cache.
+
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The ID of channel to get.
+
+        Returns
+        -------
+        Optional[Union[:class:`ServerChannel`, :class:`PrivateChannel`]]
+            The requested channel; if exists. Otherwise ``None``.
+        """
+        return self.__channels.get(channel_id)
+
+    def remove_channel(self, channel_id: str) -> Optional[ChannelT]:
+        """Removes a channel from the cache.
+
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The ID of channel to remove.
+
+        Returns
+        -------
+        Optional[Union[:class:`ServerChannel`, :class:`PrivateChannel`]]
+            The remoevd channel; if exists. Otherwise ``None``.
+        """
+        return self.__channels.pop(channel_id, None)

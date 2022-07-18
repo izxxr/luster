@@ -14,6 +14,9 @@ from typing import (
 from abc import ABC, abstractmethod
 from luster.exceptions import WebsocketError
 from luster.users import User, Relationship
+from luster.server import Server
+from luster.enums import RelationshipStatus
+from luster.channels import channel_factory
 from luster import events
 
 import asyncio
@@ -25,6 +28,7 @@ import traceback
 
 if TYPE_CHECKING:
     from luster.types.websocket import EventTypeRecv
+    from luster.channels import ServerChannel
     from luster.events import BaseEvent
     from luster.state import State
     from luster import types
@@ -116,7 +120,7 @@ class ListenersMixin(ABC):
         """
         handler = self._get_events_handler()
         return handler.listeners.pop(event, [])
-    
+
     def remove_listener(self, event: EventTypeRecv, callback: Listener[Any]) -> bool:
         """Removes an event listener for the given event.
 
@@ -228,11 +232,7 @@ class EventsHandler(ListenersMixin):
 
     @event_handler("Pong")
     async def on_pong(self, data: types.PongEvent) -> None:
-        # TODO: Revolt API currently does not send a PONG event for
-        # some reason and I suspect that's a bug.
         inner = data["data"]
-        _LOGGER.debug("Ping has been acknowledged. (ts: %r)", inner)
-
         event = events.Pong(data=inner)
         self.call_listeners(event)
 
@@ -244,14 +244,32 @@ class EventsHandler(ListenersMixin):
     @event_handler("Ready")
     async def on_ready(self, data: types.ReadyEvent) -> None:
         state = self._state
-        users = data.get("users", [])
 
-        _LOGGER.info("Preparing cache for %r users", len(users))
+        users = data.get("users", [])
+        servers = data.get("servers", [])
+        channels = data.get("channels", [])
+
+        _LOGGER.info("Preparing client cache. (%r users, %r servers, %r channels)",
+                     len(users), len(servers), len(channels))
 
         for user in users:
-            state.cache.add_user(User(user, state))
+            obj = User(user, state)
+            state.cache.add_user(obj)
 
-        _LOGGER.info("Client is ready.")
+            if obj.relationship == RelationshipStatus.USER:
+                client = state.get_client()
+                if client:
+                    client.user = obj
+
+        for channel in channels:
+            cls = channel_factory(channel["channel_type"])
+            # Type checker fails to resolve signature of cls
+            state.cache.add_channel(cls(channel, state))  # type: ignore
+
+        for server in servers:
+            state.cache.add_server(Server(server, state))
+
+        _LOGGER.info("Successfully cached the entities.")
 
         event = events.Ready()
         self.call_listeners(event)
@@ -263,7 +281,7 @@ class EventsHandler(ListenersMixin):
         user = state.cache.get_user(user_id)
 
         if user is None:
-            _LOGGER.debug("(Event: UserUpdate) User %r is not cached.", user_id)
+            _LOGGER.debug("(UserUpdate) User %r is not cached.", user_id)
             return
 
         before = copy.copy(user)
@@ -297,4 +315,95 @@ class EventsHandler(ListenersMixin):
         after = Relationship({"_id": user.id, "status": data["status"]}, user)  # type: ignore
 
         event = events.UserRelationship(before=before, after=after)
+        self.call_listeners(event)
+
+    @event_handler("ServerCreate")
+    async def on_server_create(self, data: types.ServerCreateEvent) -> None:
+        state = self._state
+        cache = state.cache
+
+        server = Server(data["server"], self._state)
+
+        for payload in data.get("channels", []):
+            cls = channel_factory(payload["channel_type"])
+            cache.add_channel(cls(payload, state))  # type: ignore
+
+        event = events.ServerCreate(server=server)
+
+        self._state.cache.add_server(server)
+        self.call_listeners(event)
+
+    @event_handler("ServerUpdate")
+    async def on_server_update(self, data: types.ServerUpdateEvent) -> None:
+        server_id = data["id"]
+        server = self._state.cache.get_server(server_id)
+
+        if server is None:
+            _LOGGER.debug("(ServerUpdate) Server %r is not cached.", server_id)
+            return
+
+        before = copy.copy(server)
+        event = events.ServerUpdate(before=before, after=server)
+
+        server.handle_field_removals(data.get("clear", []))
+        server.update(data["data"])
+        self.call_listeners(event)
+
+
+    @event_handler("ServerDelete")
+    async def on_server_delete(self, data: types.ServerDeleteEvent) -> None:
+        cache = self._state.cache
+        server_id = data["id"]
+        server = cache.remove_server(server_id)
+
+        if server is None:
+            _LOGGER.debug("(ServerDelete) Server %r is not cached.", server_id)
+            return
+
+        channels: List[ServerChannel] = []
+        for channel_id in server.channel_ids:
+            channel = cache.remove_channel(channel_id)
+            if channel:
+                channels.append(channel)  # type: ignore
+
+        event = events.ServerDelete(server=server, channels=channels)
+        self.call_listeners(event)
+
+    @event_handler("ChannelCreate")
+    async def on_channel_create(self, data: types.ChannelCreateEvent) -> None:
+        cls = channel_factory(data["channel_type"])
+        state = self._state
+        channel = cls(data, state)  # type: ignore
+        state.cache.add_channel(channel)
+
+        event = events.ChannelCreate(channel=channel)
+        self.call_listeners(event)
+
+    @event_handler("ChannelUpdate")
+    async def on_channel_update(self, data: types.ChannelUpdateEvent) -> None:
+        channel_id = data["id"]
+        channel = self._state.cache.get_channel(channel_id)
+
+        if channel is None:
+            _LOGGER.debug("(ChannelUpdate) Channel %r is not cached.", channel_id)
+            return
+
+        before = copy.copy(channel)
+
+        channel.handle_field_removals(data.get("clear", []))
+        channel.update(data["data"])
+
+        event = events.ChannelUpdate(before=before, after=channel)
+        self.call_listeners(event)
+
+    @event_handler("ChannelDelete")
+    async def on_channel_delete(self, data: types.ChannelDeleteEvent) -> None:
+        channel_id = data["id"]
+        channel = self._state.cache.remove_channel(channel_id)
+
+        if channel is None:
+            _LOGGER.debug("(ChannelDelete) Channel %r is not cached.", channel_id)
+            return
+
+        event = events.ChannelDelete(channel=channel)
         self.call_listeners(event)

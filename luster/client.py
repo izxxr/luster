@@ -5,22 +5,28 @@ from __future__ import annotations
 from typing import (
     TYPE_CHECKING,
     Callable,
+    List,
     Optional,
     Type,
+    Union,
 )
 from typing_extensions import Self
 from luster.internal.events_handler import BE, EventsHandler, ListenersMixin, Listener
 from luster.http import create_http_handler, HTTPHandler
+from luster.internal.helpers import MISSING
 from luster.websocket import WebsocketHandler
 from luster.cache import Cache
 from luster.state import State
 from luster.users import User
 from luster.file import PartialUploadedFile
+from luster.channels import ChannelT, channel_factory
+from luster.server import Server
 
 import asyncio
 
 if TYPE_CHECKING:
     from aiohttp import ClientSession
+    from luster.channels import DirectMessage, Group
     from luster import types
     from io import BufferedReader
 
@@ -61,6 +67,12 @@ class Client(ListenersMixin):
     cache_cls: Type[:class:`Cache`]
         The class type of :class:`Cache`. This can be used
         to set custom subclasses on :attr:`.cache`.
+
+    Attributes
+    ----------
+    user: Optional[:class:`User`]
+        The user for the connected client. This is only set after connection
+        with Revolt API has been made.
     """
 
     def __init__(
@@ -83,9 +95,10 @@ class Client(ListenersMixin):
         )
         self.__events_handler = EventsHandler(state=self.__state)
         self.__initialized: bool = False
-
         self.__state.set_client(self)
-        self.__websocket_handler.set_events_handler(self.__events_handler) 
+        self.__websocket_handler.set_events_handler(self.__events_handler)
+
+        self.user: Optional[User] = None
 
     async def __aenter__(self) -> Self:
         await self._async_init()
@@ -147,6 +160,18 @@ class Client(ListenersMixin):
         """
         return self.__cache
 
+    @property
+    def latency(self) -> float:
+        """The websocket latency.
+
+        A shorthand for :attr:`WebsocketHandler.latency`.
+
+        Returns
+        -------
+        :class:`float`
+        """
+        return self.__websocket_handler.latency
+
     def listen(self, event: types.EventTypeRecv) -> Callable[[Listener[BE]], Listener[BE]]:
         """A decorator for registering an event listener.
 
@@ -174,6 +199,7 @@ class Client(ListenersMixin):
         await self.__http_handler.close()
         await self.__websocket_handler.close()
 
+        self.user = None
         self.__initialized = False
         await self.close_hook()
 
@@ -306,3 +332,116 @@ class Client(ListenersMixin):
         }
         data = await self.__http_handler.change_username(json)
         return User(data, self.__state)
+
+    # Channels
+
+    async def fetch_channel(self, channel_id: str) -> ChannelT:
+        """Fetches a channel.
+
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The ID of channel to fetch.
+
+        Returns
+        -------
+        Union[:class:`ServerChannel`, :class:`PrivateChannel`]
+            The fetched channel.
+
+        Raises
+        ------
+        HTTPException
+            The fetching failed.
+        HTTPNotFound
+            Invalid channel ID.
+        """
+        data = await self.__http_handler.fetch_channel(channel_id)
+        cls = channel_factory(data["channel_type"])
+        return cls(data, self.__state)  # type: ignore
+
+    async def fetch_dms(self) -> List[Union[DirectMessage, Group]]:
+        """Fetches the direct messages and groups that are currently opened.
+
+        Returns
+        -------
+        List[Union[:class:`DirectMessage`, :class:`Group`]]
+            The current direct message channels.
+
+        Raises
+        ------
+        HTTPException
+            The fetching failed.
+        """
+        data = await self.__http_handler.fetch_direct_message_channels()
+        ret: List[Union[DirectMessage, Group]] = []
+
+        for item in data:
+            cls = channel_factory(item["channel_type"])
+            ret.append(cls(item, self.__state))  # type: ignore
+
+        return ret
+
+    # Servers
+
+    async def fetch_server(self, server_id: str) -> Server:
+        """Fetches a server via it's ID.
+
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The ID of channel to fetch.
+
+        Returns
+        -------
+        :class:`Server`
+            The requested server.
+
+        Raises
+        ------
+        HTTPNotFound
+            The server does not exist.
+        HTTPException
+            Fetching of server failed.
+        """
+        data = await self.__http_handler.fetch_server(server_id)
+        return Server(data, self.__state)
+
+    async def create_server(
+        self,
+        *,
+        name: str,
+        description: str = MISSING,
+        nsfw: bool = MISSING,
+    ) -> Server:
+        """Creates a server.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of server.
+        description: :class:`str`
+            The description of server.
+        nsfw: :class:`bool`
+            Whether this server is NSFW.
+
+        Returns
+        -------
+        :class:`Server`
+            The created server.
+
+        Raises
+        ------
+        HTTPException
+            Creation of server failed.
+        """
+        json: types.CreateServerJSON = {
+            "name": name,
+        }
+
+        if description is not MISSING:
+            json["description"] = description
+        if nsfw is not MISSING:
+            json["nsfw"] = nsfw
+
+        data = await self.__http_handler.create_server(json=json)
+        return Server(data, self.__state)

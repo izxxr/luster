@@ -17,6 +17,11 @@ __all__ = (
     "PresenceType",
     "RelationshipStatus",
     "UserRemoveField",
+    "ChannelTypeServer",
+    "ChannelTypePrivate",
+    "ChannelType",
+    "ChannelRemoveField",
+    "ServerRemoveField",
 )
 
 
@@ -42,3 +47,12 @@ FileTag = Literal["attachments", "avatars", "banners", "icons", "emojis", "backg
 PresenceType = Literal["Online", "Idle", "Busy", "Invisible"]
 RelationshipStatus = Literal["None", "User", "Friend", "Outgoing", "Incoming", "Blocked", "BlockedOther"]
 UserRemoveField = Literal["Avatar", "StatusText", "StatusPresence", "ProfileContent", "ProfileBackground"]
+
+# Channels
+ChannelTypeServer = Literal["TextChannel", "VoiceChannel"]
+ChannelTypePrivate = Literal["SavedMessages", "DirectMessage", "Group"]
+ChannelType = Union[ChannelTypeServer, ChannelTypePrivate]
+ChannelRemoveField = Literal["Description", "Icon", "DefaultPermissions"]
+
+# Servers
+ServerRemoveField = Literal["Description", "Categories", "SystemMessages", "Icon", "Banner"]

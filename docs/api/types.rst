@@ -61,8 +61,27 @@ This section documents various enumerations from the Revolt API. All these are t
 
 .. data:: UserRemoveField
 
-    The fields that can be removed from a user object.
+    The fields that can be removed from a user object by editing it.
 
+.. data:: ChannelTypeServer
+
+    The channel types related to a server.
+
+.. data:: ChannelTypePrivate
+
+    The channel types for private channels.
+
+.. data:: ChannelType
+
+    All channel types.
+
+.. data:: ChannelRemoveField
+
+    The fields that can be removed from channel object by editing it.
+
+.. data:: ServerRemoveField
+
+    The fields that can be removed from server object by editing it.
 
 API Models
 ----------
@@ -170,6 +189,69 @@ Permissions
 .. autoclass:: Permissions()
     :members:
 
+SavedMessages
+~~~~~~~~~~~~~
+
+.. autoclass:: SavedMessages()
+    :members:
+
+DirectMessage
+~~~~~~~~~~~~~
+
+.. autoclass:: DirectMessage()
+    :members:
+
+
+Group
+~~~~~
+
+.. autoclass:: Group()
+    :members:
+
+TextChannel
+~~~~~~~~~~~
+
+.. autoclass:: TextChannel()
+    :members:
+
+VoiceChannel
+~~~~~~~~~~~~
+
+.. autoclass:: VoiceChannel()
+    :members:
+
+ServerChannel
+~~~~~~~~~~~~~
+
+.. data:: ServerChannel
+
+    A type alias for :class:`typing.Union` of various Server channels.
+
+    This currently includes:
+
+    - :class:`TextChannel`
+    - :class:`VoiceChannel`
+
+PrivateChannel
+~~~~~~~~~~~~~~
+
+.. data:: PrivateChannel
+
+    A type alias for :class:`typing.Union` of various private channel types.
+
+    This currently includes:
+
+    - :class:`SavedMessages`
+    - :class:`DirectMessages`
+    - :class:`Group`
+
+Channel
+~~~~~~~
+
+.. data:: Channel
+
+    A type alias for :class:`typing.Union` of all channel types mentioned above.
+
 
 HTTP Routes
 -----------
@@ -230,6 +312,122 @@ UploadFileResponse
 
 .. autoclass:: UploadFileResponse()
     :members:
+
+CreateServerJSON
+~~~~~~~~~~~~~~~~
+
+.. autoclass:: CreateServerJSON()
+    :members:
+
+CreateServerResponse
+~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: CreateServerResponse()
+    :members:
+
+FetchServerResponse
+~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: FetchServerResponse()
+    :members:
+
+EditServerJSON
+~~~~~~~~~~~~~~
+
+.. autoclass:: EditServerJSON()
+    :members:
+
+EditServerResponse
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: EditServerResponse()
+    :members:
+
+DeleteServerResponse
+~~~~~~~~~~~~~~~~~~~~
+
+.. data:: DeleteServerResponse
+
+    A type alias representing response of :meth:`luster.HTTPHandler.delete_server` route.
+
+MarkServerAsReadResponse
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: MarkServerAsReadResponse
+
+    A type alias representing response of :meth:`luster.HTTPHandler.mark_server_as_read` route.
+
+CreateServerChannelJSON
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: CreateServerChannelJSON()
+    :members:
+
+CreateServerChannelResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: CreateServerChannelResponse
+
+    A type alias representing response of :meth:`luster.HTTPHandler.create_server_channel` route.
+
+
+FetchDirectMessageChannelsResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: FetchDirectMessageChannelsResponse
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.fetch_direct_message_channels`
+    route.
+
+    This is equivalent to :class:`typing.List` of :class:`DirectMessage` and :class:`Group`.
+
+OpenDirectMessageResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: OpenDirectMessageResponse
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.open_direct_message`
+    route.
+
+    This is equivalent to :class:`typing.Union` of :class:`DirectMessage` and :class:`SavedMessages`.
+
+FetchChannelResponse
+~~~~~~~~~~~~~~~~~~~~
+
+.. data:: FetchChannelResponse
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.fetch_channel`
+    route.
+
+    This is equivalent to :data:`Channel`.
+
+
+DeleteChannelResponse
+~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: DeleteChannelResponse
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.close_channel`
+    route.
+
+    This is equivalent to Literal[``None``].
+
+
+EditChannelJSON
+~~~~~~~~~~~~~~~
+
+.. autoclass:: EditChannelJSON
+    :members:
+
+EditChannelResponse
+~~~~~~~~~~~~~~~~~~~
+
+.. data:: EditChannelResponse
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.edit_channel`
+    route.
+
+    This is equivalent to :data:`Channel`.
 
 
 Websocket Events
@@ -309,4 +507,52 @@ UserRelationshipEvent
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserRelationshipEvent()
+    :members:
+
+ServerCreateEvent
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerCreateEvent()
+    :members:
+
+ServerUpdateEvent
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerUpdateEvent()
+    :members:
+
+ServerUpdateEventData
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerUpdateEventData()
+    :members:
+
+ServerDeleteEvent
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerDeleteEvent()
+    :members:
+
+ChannelCreateEvent
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChannelCreateEvent()
+    :members:
+
+ChannelUpdateEvent
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChannelUpdateEvent()
+    :members:
+
+ChannelUpdateEventData
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChannelUpdateEventData()
+    :members:
+
+ChannelDeleteEvent
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChannelDeleteEvent()
     :members:
