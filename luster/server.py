@@ -166,6 +166,10 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
     def _handle_update_nsfw(self, new: bool) -> None:
         self.nsfw = new
 
+    @handle_update("channels")
+    def _handle_update_channels(self, new: List[str]) -> None:
+        self.channel_ids = new
+
     def channels(self) -> List[ServerChannel]:
         """The list of channels in this server.
 

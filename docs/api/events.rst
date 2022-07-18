@@ -105,3 +105,21 @@ ServerDelete
 
 .. autoclass:: ServerDelete
     :members:
+
+ChannelCreate
+~~~~~~~~~~~~~
+
+.. autoclass:: ServerCreate
+    :members:
+
+ChannelUpdate
+~~~~~~~~~~~~~
+
+.. autoclass:: ServerUpdate
+    :members:
+
+ChannelDelete
+~~~~~~~~~~~~~
+
+.. autoclass:: ServerDelete
+    :members:

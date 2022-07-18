@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import (
     Any,
+    Dict,
     List,
     Optional,
     TypedDict,
@@ -13,6 +14,7 @@ from typing import (
 from typing_extensions import NotRequired
 from luster.types.channels import Category, Channel, ServerChannel
 from luster.types.file import File
+from luster.types.roles import Permissions
 from luster.types.users import Profile, Status, User
 from luster.types.servers import Server, SystemMessages
 
@@ -24,6 +26,7 @@ if TYPE_CHECKING:
         UserRemoveField,
         RelationshipStatus,
         ServerRemoveField,
+        ChannelRemoveField,
     )
 
 
@@ -47,6 +50,10 @@ __all__ = (
     "ServerUpdateEvent",
     "ServerUpdateEventData",
     "ServerDeleteEvent",
+    "ChannelCreateEvent",
+    "ChannelUpdateEvent",
+    "ChannelUpdateEventData",
+    "ChannelDeleteEvent",
 )
 
 class BaseWebsocketEvent(TypedDict):
@@ -274,6 +281,9 @@ class ServerUpdateEventData(TypedDict, total=False):
     discoverable: bool
     """Whether this server is discoverable."""
 
+    channel_ids: List[str]
+    """The list of IDs of channels in this server."""
+
 
 class ServerUpdateEvent(TypedDict):
     """Represents an event indicating update of a server."""
@@ -289,3 +299,73 @@ class ServerUpdateEvent(TypedDict):
 
     clear: List[ServerRemoveField]
     """The fields removed from server object."""
+
+
+# ! FIXME: This event is equivalent to channel payload but due to how
+# currently channel types are structured, It is difficult to properly
+# define this typed dict so this will require restructuing channel types.
+class ChannelCreateEvent(TypedDict):
+    """Represents an event indicating creation of a channel."""
+
+    type: Literal["ChannelCreate"]
+    """The type of event."""
+
+    _id: str
+    """The ID of created channel."""
+
+    channel_type: str
+    """The type of created channel."""
+
+
+class ChannelUpdateEventData(TypedDict, total=False):
+    """Represents the updated data in a :class:`ChannelUpdateEvent`."""
+
+    name: str
+    """The name of channel."""
+
+    description: Optional[str]
+    """The description of channel."""
+
+    icon: Optional[File]
+    """The icon of channel."""
+
+    default_permissions: Permissions
+    """The default permissions for this channel."""
+
+    role_permissions: Dict[str, Permissions]
+    """A mapping with key being role ID and value being role :class:`Permissions`."""
+
+    nsfw: bool
+    """Whether this group is marked as NSFW."""
+
+    recipients: List[str]
+    """An array of IDs of users included in this channel."""
+
+    active: bool
+    """Whether this channel is active on both sides."""
+
+
+class ChannelUpdateEvent(TypedDict):
+    """Represents an event indicating update of a channel."""
+
+    type: Literal["ChannelCreate"]
+    """The type of event."""
+
+    id: str
+    """The ID of channel."""
+
+    clear: List[ChannelRemoveField]
+    """The list of fields to remove from channel."""
+
+    data: ChannelUpdateEventData
+    """The updated data."""
+
+
+class ChannelDeleteEvent(TypedDict):
+    """Represents an event indicating deletion of a channel."""
+
+    type: Literal["ChannelDelete"]
+    """The type of event."""
+
+    id: str
+    """The deleted channel's ID."""

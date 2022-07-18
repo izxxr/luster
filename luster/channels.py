@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
+from luster.types.websocket import ChannelUpdateEventData
 from luster.internal.mixins import StateAware
+from luster.internal.update_handler import UpdateHandler, handle_update
 from luster.internal.helpers import MISSING, get_attachment_id, upsert_remove_value
 from luster.enums import ChannelType
 from luster.file import File
@@ -106,7 +108,7 @@ class _EditChannelMixin(StateAware):
             return self.__class__(data, self._state)  # type: ignore
 
 
-class ServerChannel(_EditChannelMixin):
+class ServerChannel(_EditChannelMixin, UpdateHandler[ChannelUpdateEventData]):
     """The common base class for channels in a server.
 
     For convenience, This type has been narrowed down to following
@@ -160,6 +162,29 @@ class ServerChannel(_EditChannelMixin):
         self.name = data["name"]
         self.description = data.get("description")
         self.nsfw = data.get("nsfw", False)
+
+    def handle_field_removals(self, fields: List[types.ChannelRemoveField]) -> None:
+        for field in fields:
+            if field == "Icon":
+                self.icon = None
+            if field == "Description":
+                self.description = None
+
+    @handle_update("name")
+    def _handle_update_name(self, new: str) -> None:
+        self.name = new
+
+    @handle_update("description")
+    def _handle_update_description(self, new: str) -> None:
+        self.description = new
+
+    @handle_update("icon")
+    def _handle_update_icon(self, new: types.File) -> None:
+        self.icon = File(new, self._state)
+
+    @handle_update("nsfw")
+    def _handle_update_nsfw(self, new: bool) -> None:
+        self.nsfw = new
 
     @property
     def server(self) -> Optional[Server]:
@@ -218,7 +243,7 @@ class VoiceChannel(ServerChannel):
     """
 
 
-class PrivateChannel(StateAware):
+class PrivateChannel(StateAware, UpdateHandler[ChannelUpdateEventData]):
     """The common base class for private channels.
 
     For convenience, This type has been narrowed down to following
@@ -253,6 +278,9 @@ class PrivateChannel(StateAware):
         self.id = data["_id"]
         self.type = data["channel_type"]
 
+    def handle_field_removals(self, fields: List[types.ChannelRemoveField]) -> None:
+        pass
+
     async def delete(self) -> None:
         """Deletes the channel.
 
@@ -270,7 +298,6 @@ class PrivateChannel(StateAware):
             You are not allowed to do this.
         """
         await self._state.http_handler.delete_channel(self.id)
-
 
 
 class SavedMessages(PrivateChannel):
@@ -311,7 +338,7 @@ class DirectMessage(PrivateChannel):
         The ID of last message sent in this channel.
     """
     if TYPE_CHECKING:
-        recipient_id: str
+        recipient_ids: List[str]
         active: bool
         last_message_id: Optional[str]
 
@@ -324,8 +351,16 @@ class DirectMessage(PrivateChannel):
         self.active = data.get("active", False)
         self.last_message_id = data.get("last_message_id")
 
+    @handle_update("recipients")
+    def _handle_update_recipients(self, new: List[str]) -> None:
+        self.recipient_ids = new
 
-class Group(PrivateChannel, _EditChannelMixin):
+    @handle_update("active")
+    def _handle_update_active(self, new: bool) -> None:
+        self.active = new
+
+
+class Group(PrivateChannel, _EditChannelMixin, UpdateHandler[ChannelUpdateEventData]):
     """Represents a group channel between several users.
 
     This class inherits :class:`PrivateChannel` class.
@@ -379,6 +414,33 @@ class Group(PrivateChannel, _EditChannelMixin):
 
         icon = data.get("icon")
         self.icon = File(icon, self._state) if icon else None
+
+    def handle_field_removals(self, fields: List[types.ChannelRemoveField]) -> None:
+        for field in fields:
+            if field == "Icon":
+                self.icon = None
+            if field == "Description":
+                self.description = None
+
+    @handle_update("name")
+    def _handle_update_name(self, new: str) -> None:
+        self.name = new
+
+    @handle_update("recipients")
+    def _handle_update_recipients(self, new: List[str]) -> None:
+        self.recipient_ids = new
+
+    @handle_update("description")
+    def _handle_update_description(self, new: str) -> None:
+        self.description = new
+
+    @handle_update("icon")
+    def _handle_update_icon(self, new: types.File) -> None:
+        self.icon = File(new, self._state)
+
+    @handle_update("nsfw")
+    def _handle_update_nsfw(self, new: bool) -> None:
+        self.nsfw = new
 
     async def fetch_owner(self) -> User:
         """Fetches the user that owns this group.

@@ -42,6 +42,15 @@ class WebsocketEvent:
     SERVER_DELETE = "ServerDelete"
     """This event is emitted when a server is deleted by our user."""
 
+    CHANNEL_CREATE = "ChannelCreate"
+    """This event is emitted when a channel is created."""
+
+    CHANNEL_UPDATE = "ChannelUpdate"
+    """This event is emitted when a channel is updated."""
+
+    CHANNEL_DELETE = "ChannelDelete"
+    """This event is emitted when a channel is deleted."""
+
 
 class FileType:
     """An enumeration detailing the values for type of a :class:`File`."""

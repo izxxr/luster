@@ -532,3 +532,27 @@ ServerDeleteEvent
 
 .. autoclass:: ServerDeleteEvent()
     :members:
+
+ChannelCreateEvent
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChannelCreateEvent()
+    :members:
+
+ChannelUpdateEvent
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChannelUpdateEvent()
+    :members:
+
+ChannelUpdateEventData
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChannelUpdateEventData()
+    :members:
+
+ChannelDeleteEvent
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChannelDeleteEvent()
+    :members:

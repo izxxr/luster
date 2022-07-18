@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from luster import types
     from luster.users import User, Relationship
     from luster.server import Server
-    from luster.channels import ServerChannel
+    from luster.channels import ServerChannel, ChannelT
 
 __all__ = (
     "BaseEvent",
@@ -24,6 +24,9 @@ __all__ = (
     "ServerCreate",
     "ServerUpdate",
     "ServerDelete",
+    "ChannelCreate",
+    "ChannelUpdate",
+    "ChannelDelete",
 )
 
 
@@ -157,3 +160,39 @@ class ServerDelete(BaseEvent):
 
     def get_event_name(self) -> types.EventTypeRecv:
         return WebsocketEvent.SERVER_DELETE
+
+
+@dataclass
+class ChannelCreate(BaseEvent):
+    """An event emitted when a channel is created."""
+
+    channel: ChannelT
+    """The new channel."""
+
+    def get_event_name(self) -> types.EventTypeRecv:
+        return WebsocketEvent.CHANNEL_CREATE
+
+
+@dataclass
+class ChannelUpdate(BaseEvent):
+    """An event emitted when a channel is updated."""
+
+    before: ChannelT
+    """The channel before the update."""
+
+    after: ChannelT
+    """The channel after the update."""
+
+    def get_event_name(self) -> types.EventTypeRecv:
+        return WebsocketEvent.CHANNEL_UPDATE
+
+
+@dataclass
+class ChannelDelete(BaseEvent):
+    """An event emitted when a channel is deleted."""
+
+    channel: ChannelT
+    """The deleted channel."""
+
+    def get_event_name(self) -> types.EventTypeRecv:
+        return WebsocketEvent.CHANNEL_DELETE

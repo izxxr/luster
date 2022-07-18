@@ -368,3 +368,42 @@ class EventsHandler(ListenersMixin):
 
         event = events.ServerDelete(server=server, channels=channels)
         self.call_listeners(event)
+
+    @event_handler("ChannelCreate")
+    async def on_channel_create(self, data: types.ChannelCreateEvent) -> None:
+        cls = channel_factory(data["channel_type"])
+        state = self._state
+        channel = cls(data, state)  # type: ignore
+        state.cache.add_channel(channel)
+
+        event = events.ChannelCreate(channel=channel)
+        self.call_listeners(event)
+
+    @event_handler("ChannelUpdate")
+    async def on_channel_update(self, data: types.ChannelUpdateEvent) -> None:
+        channel_id = data["id"]
+        channel = self._state.cache.get_channel(channel_id)
+
+        if channel is None:
+            _LOGGER.debug("(ChannelUpdate) Channel %r is not cached.", channel_id)
+            return
+
+        before = copy.copy(channel)
+
+        channel.handle_field_removals(data.get("clear", []))
+        channel.update(data["data"])
+
+        event = events.ChannelUpdate(before=before, after=channel)
+        self.call_listeners(event)
+
+    @event_handler("ChannelDelete")
+    async def on_channel_delete(self, data: types.ChannelDeleteEvent) -> None:
+        channel_id = data["id"]
+        channel = self._state.cache.remove_channel(channel_id)
+
+        if channel is None:
+            _LOGGER.debug("(ChannelDelete) Channel %r is not cached.", channel_id)
+            return
+
+        event = events.ChannelDelete(channel=channel)
+        self.call_listeners(event)
