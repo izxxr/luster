@@ -111,11 +111,14 @@ class CreateServerJSON(TypedDict):
     """Whether to mark server as NSFW."""
 
 
-class CreateServerResponse(Server):
-    """Represents the response for :meth:`luster.HTTPHandler.create_server` route.
+class CreateServerResponse(TypedDict):
+    """Represents the response for :meth:`luster.HTTPHandler.create_server` route."""
 
-    This is equivalent to :class:`Server` type.
-    """
+    server: Server
+    """The created server."""
+
+    channels: List[ServerChannel]
+    """The server's channels."""
 
 
 class FetchServerResponse(Server):

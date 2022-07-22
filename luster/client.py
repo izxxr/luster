@@ -455,7 +455,14 @@ class Client(ListenersMixin):
             json["nsfw"] = nsfw
 
         data = await self.__http_handler.create_server(json=json)
-        return Server(data, self.__state)
+
+        server = Server(data["server"], self.__state)
+
+        for channel in data.get("channels", []):
+            cls = channel_factory(channel["channel_type"])
+            self.__cache.add_channel(cls(channel, self.__state))  # type: ignore
+
+        return server
 
     async def create_group(
         self,
