@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from luster.cache import Cache
     from luster.http import HTTPHandler
     from luster.websocket import WebsocketHandler
+    from luster.users import User
 
 __all__ = (
     "State",
@@ -47,6 +48,7 @@ class State:
         self.__websocket_handler = websocket_handler
         self.__cache = cache
         self.__client: Optional[Client] = None
+        self.__user: Optional[User] = None
 
         http_handler.set_state(self)
         websocket_handler.set_state(self)
@@ -63,6 +65,14 @@ class State:
         if client:
             self.__client = None
             return client
+
+    @property
+    def user(self) -> Optional[User]:
+        return self.__user
+
+    @user.setter
+    def user(self, value: Optional[User]) -> Optional[User]:
+        self.__user = value
 
     @property
     def http_handler(self) -> HTTPHandler:

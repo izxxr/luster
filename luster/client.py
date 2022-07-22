@@ -98,8 +98,6 @@ class Client(ListenersMixin):
         self.__state.set_client(self)
         self.__websocket_handler.set_events_handler(self.__events_handler)
 
-        self.user: Optional[User] = None
-
     async def __aenter__(self) -> Self:
         await self._async_init()
         return self
@@ -172,6 +170,18 @@ class Client(ListenersMixin):
         """
         return self.__websocket_handler.latency
 
+    @property
+    def user(self) -> Optional[User]:
+        """The user for the connected client.
+
+        This is only set after connection with Revolt API has been made.
+
+        Returns
+        -------
+        Optional[:class:`User`]
+        """
+        return self.__state.user
+
     def listen(self, event: types.EventTypeRecv) -> Callable[[Listener[BE]], Listener[BE]]:
         """A decorator for registering an event listener.
 
@@ -199,7 +209,7 @@ class Client(ListenersMixin):
         await self.__http_handler.close()
         await self.__websocket_handler.close()
 
-        self.user = None
+        self.__state.user = None
         self.__initialized = False
         await self.close_hook()
 

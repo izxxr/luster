@@ -257,9 +257,7 @@ class EventsHandler(ListenersMixin):
             state.cache.add_user(obj)
 
             if obj.relationship == RelationshipStatus.USER:
-                client = state.get_client()
-                if client:
-                    client.user = obj
+                self._state.user = obj
 
         for channel in channels:
             cls = channel_factory(channel["channel_type"])
@@ -419,9 +417,6 @@ class EventsHandler(ListenersMixin):
             _LOGGER.debug("(ChannelGroupJoin) Channel %r is not cached.", channel_id)
             return
 
-        user_id = data["user"]
-        user = cache.get_user(user_id)
-
         event = events.ChannelGroupJoin(channel=channel, user=user, user_id=user_id)  # type: ignore
         self.call_listeners(event)
 
@@ -430,14 +425,19 @@ class EventsHandler(ListenersMixin):
         cache = self._state.cache
 
         channel_id = data["id"]
-        channel = cache.get_channel(channel_id)
+        user_id = data["user"]
+
+        assert self._state.user is not None, "Connected user is not stored in state."
+        if user_id == self._state.user.id:
+            channel = cache.remove_channel(channel_id)
+        else:
+            channel = cache.get_channel(channel_id)
 
         if channel is None:
             _LOGGER.debug("(ChannelGroupLeave) Channel %r is not cached.", channel_id)
             return
 
-        user_id = data["user"]
         user = cache.get_user(user_id)
-
         event = events.ChannelGroupLeave(channel=channel, user=user, user_id=user_id)  # type: ignore
+
         self.call_listeners(event)
