@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any, List, Optional
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from luster.enums import WebsocketEvent
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from luster import types
     from luster.users import User, Relationship
     from luster.server import Server
-    from luster.channels import ServerChannel, ChannelT
+    from luster.channels import ServerChannel, ChannelT, Group
 
 __all__ = (
     "BaseEvent",
@@ -27,6 +27,10 @@ __all__ = (
     "ChannelCreate",
     "ChannelUpdate",
     "ChannelDelete",
+    "ChannelGroupJoin",
+    "ChannelGroupLeave",
+    "GroupJoin",
+    "GroupLeave",
 )
 
 
@@ -196,3 +200,74 @@ class ChannelDelete(BaseEvent):
 
     def get_event_name(self) -> types.EventTypeRecv:
         return WebsocketEvent.CHANNEL_DELETE
+
+
+@dataclass
+class ChannelGroupJoin(BaseEvent):
+    """An event emitted when a user joins a group."""
+
+    channel: Group
+    """The joined group."""
+
+    user: Optional[User]
+    """The user that joined the group.
+
+    If the user isn't cached, This might be ``None``.
+    Consider relying on :attr:`.user_id` for those cases
+    for fetching the user manually.
+    """
+
+    user_id: str
+    """The ID of user that joined."""
+
+    @property
+    def group(self) -> Group:
+        """The joined group.
+
+        Returns
+        -------
+        :class:`Group`
+        """
+        return self.channel
+
+    def get_event_name(self) -> types.EventTypeRecv:
+        return WebsocketEvent.CHANNEL_GROUP_JOIN
+
+
+@dataclass
+class ChannelGroupLeave(BaseEvent):
+    """An event emitted when a user leaves a group."""
+
+    channel: Group
+    """The left group."""
+
+    user: Optional[User]
+    """The user that left the group.
+
+    If the user isn't cached, This might be ``None``.
+    Consider relying on :attr:`.user_id` for those cases
+    for fetching the user manually.
+    """
+
+    user_id: str
+    """The ID of user that left."""
+
+    @property
+    def group(self) -> Group:
+        """The left group.
+
+        Returns
+        -------
+        :class:`Group`
+        """
+        return self.channel
+
+    def get_event_name(self) -> types.EventTypeRecv:
+        return WebsocketEvent.CHANNEL_GROUP_LEAVE
+
+
+GroupJoin = ChannelGroupJoin
+"""An alias for :class:`ChannelGroupJoin`."""
+
+GroupLeave = ChannelGroupLeave
+"""An alias for :class:`ChannelGroupLeave`."""

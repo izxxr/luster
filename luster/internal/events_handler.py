@@ -407,3 +407,37 @@ class EventsHandler(ListenersMixin):
 
         event = events.ChannelDelete(channel=channel)
         self.call_listeners(event)
+
+    @event_handler("ChannelGroupJoin")
+    async def on_channel_group_join(self, data: types.ChannelGroupJoinEvent) -> None:
+        cache = self._state.cache
+
+        channel_id = data["id"]
+        channel = cache.get_channel(channel_id)
+
+        if channel is None:
+            _LOGGER.debug("(ChannelGroupJoin) Channel %r is not cached.", channel_id)
+            return
+
+        user_id = data["user"]
+        user = cache.get_user(user_id)
+
+        event = events.ChannelGroupJoin(channel=channel, user=user, user_id=user_id)  # type: ignore
+        self.call_listeners(event)
+
+    @event_handler("ChannelGroupLeave")
+    async def on_channel_group_leave(self, data: types.ChannelGroupLeaveEvent) -> None:
+        cache = self._state.cache
+
+        channel_id = data["id"]
+        channel = cache.get_channel(channel_id)
+
+        if channel is None:
+            _LOGGER.debug("(ChannelGroupLeave) Channel %r is not cached.", channel_id)
+            return
+
+        user_id = data["user"]
+        user = cache.get_user(user_id)
+
+        event = events.ChannelGroupLeave(channel=channel, user=user, user_id=user_id)  # type: ignore
+        self.call_listeners(event)

@@ -51,6 +51,18 @@ class WebsocketEvent:
     CHANNEL_DELETE = "ChannelDelete"
     """This event is emitted when a channel is deleted."""
 
+    CHANNEL_GROUP_JOIN = "ChannelGroupJoin"
+    """This event is emitted when a user joins a group."""
+
+    GROUP_JOIN = CHANNEL_GROUP_JOIN
+    """An alias for :attr:`.CHANNEL_GROUP_JOIN`"""
+
+    CHANNEL_GROUP_LEAVE = "ChannelGroupLeave"
+    """This event is emitted when a user joins a group."""
+
+    GROUP_LEAVE = CHANNEL_GROUP_LEAVE
+    """An alias for :attr:`.CHANNEL_GROUP_LEAVE`"""
+
 
 class FileType:
     """An enumeration detailing the values for type of a :class:`File`."""

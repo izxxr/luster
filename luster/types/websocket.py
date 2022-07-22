@@ -54,6 +54,8 @@ __all__ = (
     "ChannelUpdateEvent",
     "ChannelUpdateEventData",
     "ChannelDeleteEvent",
+    "ChannelGroupJoinEvent",
+    "ChannelGroupLeaveEvent",
 )
 
 class BaseWebsocketEvent(TypedDict):
@@ -369,3 +371,29 @@ class ChannelDeleteEvent(TypedDict):
 
     id: str
     """The deleted channel's ID."""
+
+
+class ChannelGroupJoinEvent(TypedDict):
+    """Represents an event indicating a user joining a group."""
+
+    type: Literal["ChannelGroupJoin"]
+    """The type of event."""
+
+    id: str
+    """The ID of channel."""
+
+    user: str
+    """The ID of user that joined."""
+
+
+class ChannelGroupLeaveEvent(TypedDict):
+    """Represents an event indicating a user leaving a group."""
+
+    type: Literal["ChannelGroupLeave"]
+    """The type of event."""
+
+    id: str
+    """The ID of channel."""
+
+    user: str
+    """The ID of user that left."""
