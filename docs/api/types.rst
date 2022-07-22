@@ -416,7 +416,7 @@ DeleteChannelResponse
 EditChannelJSON
 ~~~~~~~~~~~~~~~
 
-.. autoclass:: EditChannelJSON
+.. autoclass:: EditChannelJSON()
     :members:
 
 EditChannelResponse
@@ -429,6 +429,41 @@ EditChannelResponse
 
     This is equivalent to :data:`Channel`.
 
+CreateGroupJSON
+~~~~~~~~~~~~~~~
+
+.. autoclass:: CreateGroupJSON()
+    :members:
+
+CreateGroupResponse
+~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: CreateGroupResponse()
+    :members:
+
+FetchGroupMembersResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: FetchGroupMembersResponse
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.fetch_group_members`
+    route.
+
+AddGroupMemberResponse
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: AddGroupMemberResponse
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.add_group_member`
+    route.
+
+RemoveGroupMemberResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: RemoveGroupMemberResponse
+
+    A type alias representing the response of :meth:`luster.HTTPHandler.remove_group_member`
+    route.
 
 Websocket Events
 ----------------

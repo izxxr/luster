@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Dict, List, Literal, Optional, TypedDict, Unio
 from typing_extensions import NotRequired
 from luster.types.file import File
 from luster.types.roles import Permissions
+from luster.types.users import User
 
 if TYPE_CHECKING:
     from luster.types.enums import ChannelRemoveField
@@ -29,6 +30,11 @@ __all__ = (
     "DeleteChannelResponse",
     "EditChannelJSON",
     "EditChannelResponse",
+    "CreateGroupResponse",
+    "CreateGroupJSON",
+    "FetchGroupMembersResponse",
+    "AddGroupMemberResponse",
+    "RemoveGroupMemberResponse",
 )
 
 
@@ -164,6 +170,7 @@ Channel = Union[ServerChannel, PrivateChannel]
 FetchDirectMessageChannelsResponse = List[Union[DirectMessage, Group]]
 OpenDirectMessageResponse = Union[DirectMessage, SavedMessages]
 FetchChannelResponse = Channel
+EditChannelResponse = Channel
 DeleteChannelResponse = Literal[None]
 
 
@@ -185,4 +192,30 @@ class EditChannelJSON(TypedDict):
     remove: NotRequired[List[ChannelRemoveField]]
     """The list of fields to remove."""
 
-EditChannelResponse = Channel
+
+class CreateGroupResponse(Group):
+    """Represents the response of :meth:`luster.HTTPHandler.create_group` route.
+
+    This is equivalent to :class:`Group`.
+    """
+
+
+class CreateGroupJSON(TypedDict):
+    """Represents the JSON body for :meth:`luster.HTTPHandler.create_group` route."""
+
+    name: str
+    """The name of group."""
+
+    description: NotRequired[Optional[str]]
+    """The description of group."""
+
+    users: List[str]
+    """The list of users to add to group."""
+
+    nsfw: NotRequired[bool]
+    """Whether this group is NSFW."""
+
+
+FetchGroupMembersResponse = List[User]
+AddGroupMemberResponse = Literal[None]
+RemoveGroupMemberResponse = Literal[None]

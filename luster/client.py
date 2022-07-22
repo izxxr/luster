@@ -14,6 +14,7 @@ from typing_extensions import Self
 from luster.internal.events_handler import BE, EventsHandler, ListenersMixin, Listener
 from luster.http import create_http_handler, HTTPHandler
 from luster.internal.helpers import MISSING
+from luster.protocols import BaseModel
 from luster.websocket import WebsocketHandler
 from luster.cache import Cache
 from luster.state import State
@@ -455,3 +456,50 @@ class Client(ListenersMixin):
 
         data = await self.__http_handler.create_server(json=json)
         return Server(data, self.__state)
+
+    async def create_group(
+        self,
+        name: str,
+        recipients: List[BaseModel] = MISSING,
+        description: str = MISSING,
+        nsfw: bool = MISSING,
+    ) -> Group:
+        """Creates a new group.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of group.
+        recipients: List[:class:`BaseModel`]
+            The recipients to add to group.
+        description: :class:`str`
+            The description of group.
+        nsfw: :class:`bool`
+            Whether this group is NSFW.
+
+        Returns
+        -------
+        :class:`Group`
+            The created group.
+
+        Raises
+        ------
+        HTTPException
+            Creation of group failed.
+        """
+        if recipients is MISSING:
+            recipients = []
+
+        json: types.CreateGroupJSON = {
+            "name": name,
+            "users": [r.id for r in recipients],
+        }
+
+        if description is not MISSING:
+            json["description"] = description
+
+        if nsfw is not MISSING:
+            json["nsfw"] = nsfw
+
+        data = await self.__http_handler.create_group(json=json)
+        return Group(data, self.__state)

@@ -10,6 +10,7 @@ from luster.internal.helpers import MISSING, get_attachment_id, upsert_remove_va
 from luster.enums import ChannelType
 from luster.file import File
 from luster.users import User
+from luster.protocols import BaseModel
 
 if TYPE_CHECKING:
     from io import BufferedReader
@@ -458,6 +459,57 @@ class Group(PrivateChannel, _EditChannelMixin, UpdateHandler[ChannelUpdateEventD
         state = self._state
         data = await state.http_handler.fetch_user(self.owner_id)
         return User(data, state)
+
+    async def fetch_recipients(self) -> List[User]:
+        """Fetches the users that are part of this group.
+
+        Returns
+        -------
+        List[:class:`User`]
+            The recipients of this group.
+
+        Raises
+        ------
+        HTTPException
+            The fetching failed.
+        """
+        state = self._state
+        data = await state.http_handler.fetch_group_members(channel_id=self.id)
+        return [User(u, state) for u in data]
+
+    async def add_recipient(self, user: BaseModel) -> None:
+        """Adds a new member to this group.
+
+        Parameters
+        ----------
+        user: :class:`BaseModel`
+            The user to add.
+
+        Raises
+        ------
+        HTTPForbidden
+            You are not allowed to add members.
+        HTTPException
+            The addition failed.
+        """
+        await self._state.http_handler.add_group_member(self.id, user.id)
+
+    async def remove_recipient(self, user: BaseModel) -> None:
+        """Removes a member from this group.
+
+        Parameters
+        ----------
+        user: :class:`BaseModel`
+            The user to remove.
+
+        Raises
+        ------
+        HTTPForbidden
+            You are not allowed to remove members.
+        HTTPException
+            The removal failed.
+        """
+        await self._state.http_handler.remove_group_member(self.id, user.id)
 
 
 class Category(StateAware):

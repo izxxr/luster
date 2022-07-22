@@ -633,3 +633,67 @@ class HTTPHandler(StateManagementMixin):
         """
         data = await self.request("PATCH", f"/channels/{channel_id}", json=json)
         return data
+
+    async def create_group(self, json: types.CreateGroupJSON) -> types.CreateGroupResponse:
+        """Creates a group.
+
+        Parameters
+        ----------
+        json: :class:`types.CreateGroupJSON`
+            The JSON body for request.
+
+        Returns
+        -------
+        :class:`types.CreateGroupResponse`
+        """
+        data = await self.request("POST", "/channels/create", json=json)
+        return data
+
+    async def fetch_group_members(self, channel_id: str) -> types.FetchGroupMembersResponse:
+        """Fetches the members of a group.
+
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The ID of group to fetch members of.
+
+        Returns
+        -------
+        :class:`types.FetchGroupMembersResponse`
+        """
+        data = await self.request("GET", f"/channels/{channel_id}/members")
+        return data
+
+    async def add_group_member(self, channel_id: str, user_id: str) -> types.AddGroupMemberResponse:
+        """Adds a member to group.
+
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The ID of group to add member to.
+        user_id: :class:`str`
+            The ID of user to add.
+
+        Returns
+        -------
+        :class:`types.AddGroupMemberResponse`
+        """
+        data = await self.request("PUT", f"/channels/{channel_id}/recipients/{user_id}")
+        return data
+
+    async def remove_group_member(self, channel_id: str, user_id: str) -> types.RemoveGroupMemberResponse:
+        """Removes a member from a group.
+
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The ID of group to remove member from.
+        user_id: :class:`str`
+            The ID of user to remove.
+
+        Returns
+        -------
+        :class:`types.RemoveGroupMemberResponse`
+        """
+        data = await self.request("DELETE", f"/channels/{channel_id}/recipients/{user_id}")
+        return data
