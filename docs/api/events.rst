@@ -123,3 +123,27 @@ ChannelDelete
 
 .. autoclass:: ServerDelete
     :members:
+
+ChannelGroupJoin
+~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChannelGroupJoin
+    :members:
+
+ChannelGroupLeave
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChannelGroupLeave
+    :members:
+
+GroupJoin
+~~~~~~~~~
+
+.. autoclass:: GroupJoin
+    :members:
+
+GroupLeave
+~~~~~~~~~~
+
+.. autoclass:: GroupLeave
+    :members:

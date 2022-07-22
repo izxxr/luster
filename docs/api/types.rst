@@ -556,3 +556,15 @@ ChannelDeleteEvent
 
 .. autoclass:: ChannelDeleteEvent()
     :members:
+
+ChannelGroupJoinEvent
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChannelGroupJoinEvent()
+    :members:
+
+ChannelGroupLeaveEvent
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ChannelGroupLeaveEvent()
+    :members:
