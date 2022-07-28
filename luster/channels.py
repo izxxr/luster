@@ -152,8 +152,6 @@ class ServerChannel(_EditChannelMixin, UpdateHandler[ChannelUpdateEventData]):
         "name",
         "description",
         "nsfw",
-        "default_permissions",
-        "role_permissions",
     )
 
     def __init__(self, data: types.ServerChannel, state: State) -> None:
