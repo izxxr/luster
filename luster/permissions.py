@@ -3,11 +3,17 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, TypeVar
+from typing_extensions import Self
 from luster.flags import BaseFlags
 
 __all__ = (
-    "BaseFlags",
+    "Permissions",
+    "PermissionOverwrite",
 )
+
+
+T = TypeVar("T", bound=type)
 
 
 class Permissions(BaseFlags):
@@ -16,6 +22,11 @@ class Permissions(BaseFlags):
     This class provides a user friendly way of manipulating permissions value
     using simple booleans. The permissions can either be passed during initialization
     as keyword arguments or raw permission value can be passed as first parameter.
+
+    Following special operations are supported between :class:`Permissions` instances:
+
+    - Equality operations
+    - Less than and greater than operations
 
     Attributes
     ----------
@@ -112,3 +123,156 @@ class Permissions(BaseFlags):
 
     move_members = 1 << 35
     """Allows removing and moving members in voice channels."""
+
+
+def _apply_default_permissions(cls: T) -> T:
+    for flag in Permissions.__valid_flags__:
+        # The flag default argument is needed so that accurate
+        # value of flag is available in getter's and setter's
+        # local scope.
+        def getter(self: T, flag: str = flag) -> Optional[bool]:
+            return self._overrides.get(flag)  # type: ignore
+
+        def setter(self: T, value: Optional[bool], flag: str = flag):
+            self._set(flag, value)  # type: ignore
+
+        prop = property(getter, setter)
+        setattr(cls, flag, prop)
+
+    return cls
+
+
+@_apply_default_permissions
+class PermissionOverwrite:
+    """Represents a permission overwrite.
+
+    Permission overwrites are used to configure overriden permissions on
+    certain server channels.
+
+    This class is similar to :class:`Permissions` and takes the same keyword
+    arguments. The main difference between this class and :class:`Permissions`
+    is that the default value for a permission is ``None`` rather than ``False``.
+
+    When initializing, either a boolean or ``None`` (default) can be passed
+    to a permission's value:
+
+    - ``None`` (default) represents inherit permission meaning the permission inherits
+      from the server's default permissions set.
+    - ``False`` represents that the permission is explicitly denied in the channel.
+    - ``True`` represents that the permission is explicitly allowed in the channel.
+
+    Equality operations between permission overwrite instances are supported.
+    """
+
+    if TYPE_CHECKING:
+        manage_channels: Optional[bool]
+        manage_channel: Optional[bool]
+        manage_server: Optional[bool]
+        manage_permissions: Optional[bool]
+        manage_roles: Optional[bool]
+        manage_customization: Optional[bool]
+        kick_members: Optional[bool]
+        ban_members: Optional[bool]
+        timeout_members: Optional[bool]
+        assign_roles: Optional[bool]
+        change_nickname: Optional[bool]
+        manage_nicknames: Optional[bool]
+        change_avatar: Optional[bool]
+        remove_avatars: Optional[bool]
+        view_channels: Optional[bool]
+        read_message_history: Optional[bool]
+        send_messages: Optional[bool]
+        manage_messages: Optional[bool]
+        manage_webhooks: Optional[bool]
+        invite_others: Optional[bool]
+        send_embeds: Optional[bool]
+        upload_files: Optional[bool]
+        masquerade: Optional[bool]
+        react: Optional[bool]
+        connect: Optional[bool]
+        speak: Optional[bool]
+        video: Optional[bool]
+        mute_members: Optional[bool]
+        deafen_members: Optional[bool]
+        move_members: Optional[bool]
+
+    __slots__ = (
+        "_overrides",
+    )
+
+    def __init__(self, **permissions: Optional[bool]) -> None:
+        self._overrides: Dict[str, Optional[bool]] = {}
+
+        for permission, value in permissions.items():
+            self._set(permission, value)
+
+    def __repr__(self) -> str:
+        overrides = ", ".join("%s=%r" % (perm, value) for perm, value in self._overrides.items())
+        return f"<{self.__class__.__name__} {overrides}>"
+
+    def __eq__(self, o: Any) -> bool:
+        if not isinstance(o, self.__class__):
+            return False
+        return self._overrides == o._overrides
+
+    def _set(self, permission: str, value: Optional[bool]) -> None:
+        if permission not in Permissions.__valid_flags__:
+            raise TypeError("Unknown permission passed %r", permission)
+        if not value in (True, False, None):
+            raise TypeError("value must be a bool or None")
+
+        self._overrides[permission] = value
+
+    def pair(self) -> Tuple[Permissions, Permissions]:
+        """Returns the allow and deny tuple pair for this overwrite.
+
+        The first element in the returned tuple is the :class:`Permissions`
+        instance with all permissions enabled that are allowed in this overwrite
+        while second element is the :class:`Permissions` with all permissions
+        enabled that are denied in this overwrite.
+
+        Returns
+        -------
+        Tuple[:class:`Permissions`, :class:`Permissions`]
+            The allow deny pair.
+        """
+        allow = Permissions()
+        deny = Permissions()
+
+        for permission, value in self._overrides.items():
+            # Implicit check won't work here since None's
+            # truth value is also False
+            if value is True:
+                setattr(allow, permission, True)
+            elif value is False:
+                setattr(deny, permission, True)
+
+        return allow, deny
+
+    @classmethod
+    def from_pair(cls, allow: Permissions, deny: Permissions) -> Self:
+        """Creates a :class:`PermissionOverwrite` from provided allow-deny pair.
+
+        Parameters
+        ----------
+        allow: :class:`Permissions`
+            Permissions instance with all permissions enabled that are
+            allowed in the overwrite.
+        deny: :class:`Permissions`
+            Permissions instance with all permissions enabled that are
+            denied in the overwrite.
+
+        Returns
+        -------
+        :class:`PermissionOverwrite`
+            The permission overwrite.
+        """
+        overwrite = cls()
+
+        for flag in Permissions.__valid_flags__:
+            if allow.get(flag):
+                setattr(overwrite, flag, True)
+            elif deny.get(flag):
+                setattr(overwrite, flag, False)
+
+        return overwrite

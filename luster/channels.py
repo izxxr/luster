@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Type, Union
 from luster.types.websocket import ChannelUpdateEventData
 from luster.internal.mixins import StateAware
 from luster.internal.update_handler import UpdateHandler, handle_update
@@ -11,6 +11,7 @@ from luster.enums import ChannelType
 from luster.file import File
 from luster.users import User
 from luster.protocols import BaseModel
+from luster.permissions import Permissions, PermissionOverwrite
 
 if TYPE_CHECKING:
     from io import BufferedReader
@@ -140,6 +141,8 @@ class ServerChannel(_EditChannelMixin, UpdateHandler[ChannelUpdateEventData]):
         name: str
         description: Optional[str]
         nsfw: bool
+        _default_permissions: types.Permissions
+        _role_permissions: Dict[str, types.Permissions]
 
     __slots__ = (
         "_state",
@@ -149,6 +152,8 @@ class ServerChannel(_EditChannelMixin, UpdateHandler[ChannelUpdateEventData]):
         "name",
         "description",
         "nsfw",
+        "default_permissions",
+        "role_permissions",
     )
 
     def __init__(self, data: types.ServerChannel, state: State) -> None:
@@ -156,13 +161,15 @@ class ServerChannel(_EditChannelMixin, UpdateHandler[ChannelUpdateEventData]):
         self._update_from_data(data)
 
     def _update_from_data(self, data: types.ServerChannel) -> None:
-        # TODO: default_permissions, role_permissions
         self.id = data["_id"]
         self.type = data["channel_type"]
         self.server_id = data["server"]
         self.name = data["name"]
         self.description = data.get("description")
         self.nsfw = data.get("nsfw", False)
+
+        self._default_permissions = data.get("default_permissions", {"a": 0, "d": 0})
+        self._role_permissions = data.get("role_permissions", {})
 
     def handle_field_removals(self, fields: List[types.ChannelRemoveField]) -> None:
         for field in fields:
@@ -187,6 +194,14 @@ class ServerChannel(_EditChannelMixin, UpdateHandler[ChannelUpdateEventData]):
     def _handle_update_nsfw(self, new: bool) -> None:
         self.nsfw = new
 
+    @handle_update("default_permissions")
+    def _handle_update_default_permissions(self, new: types.Permissions) -> None:
+        self._default_permissions = new
+
+    @handle_update("role_permissions")
+    def _handle_update_role_permissions(self, new: Dict[str, types.Permissions]) -> None:
+        self._role_permissions = new
+
     @property
     def server(self) -> Optional[Server]:
         """The server for this channel.
@@ -200,6 +215,35 @@ class ServerChannel(_EditChannelMixin, UpdateHandler[ChannelUpdateEventData]):
             The channel's server.
         """
         return self._state.cache.get_server(self.server_id)
+
+    @property
+    def default_permissions(self) -> PermissionOverwrite:
+        """The default permission overwrite on this channel.
+
+        Returns
+        -------
+        :class:`PermissionOverwrite`
+        """
+        allow = Permissions(self._default_permissions["a"])
+        deny = Permissions(self._default_permissions["d"])
+        return PermissionOverwrite.from_pair(allow, deny)
+
+    @property
+    def role_permissions(self) -> Mapping[str, PermissionOverwrite]:
+        """The default permission overwrite on this channel.
+
+        Returns
+        -------
+        :class:`PermissionOverwrite`
+        """
+        permissions: Mapping[str, PermissionOverwrite] = {}
+
+        for role_id, overwrite in self._role_permissions.items():
+            allow = Permissions(overwrite["a"])
+            deny = Permissions(overwrite["d"])
+            permissions[role_id] = PermissionOverwrite.from_pair(allow, deny)
+
+        return permissions
 
     async def delete(self) -> None:
         """Deletes the channel.
@@ -382,6 +426,8 @@ class Group(PrivateChannel, _EditChannelMixin, UpdateHandler[ChannelUpdateEventD
         The ID of last message sent in this channel.
     nsfw: :class:`bool`
         Whether this channel is marked as NSFW.
+    permissions: :class:`Permissions`
+        The default set of permissions applied to every member in the group.
     """
     if TYPE_CHECKING:
         name: str
@@ -391,6 +437,7 @@ class Group(PrivateChannel, _EditChannelMixin, UpdateHandler[ChannelUpdateEventD
         icon: Optional[File]
         nsfw: bool
         last_message_id: Optional[str]
+        default_permissions: Permissions
 
     __slots__ = (
         "name",
@@ -400,10 +447,10 @@ class Group(PrivateChannel, _EditChannelMixin, UpdateHandler[ChannelUpdateEventD
         "icon",
         "nsfw",
         "last_message_id",
+        "default_permissions",
     )
 
     def _update_from_data(self, data: types.Group) -> None:
-        # TODO: permissions
         super()._update_from_data(data)
 
         self.name = data["name"]
@@ -412,6 +459,7 @@ class Group(PrivateChannel, _EditChannelMixin, UpdateHandler[ChannelUpdateEventD
         self.description = data.get("description")
         self.nsfw = data.get("nsfw", False)
         self.last_message_id = data.get("last_message_id")
+        self.default_permissions = Permissions(data.get("permissions", 0))
 
         icon = data.get("icon")
         self.icon = File(icon, self._state) if icon else None
@@ -442,6 +490,10 @@ class Group(PrivateChannel, _EditChannelMixin, UpdateHandler[ChannelUpdateEventD
     @handle_update("nsfw")
     def _handle_update_nsfw(self, new: bool) -> None:
         self.nsfw = new
+
+    @handle_update("permissions")
+    def _handle_update_permissions(self, new: int) -> None:
+        self.default_permissions = Permissions(new)
 
     async def fetch_owner(self) -> User:
         """Fetches the user that owns this group.

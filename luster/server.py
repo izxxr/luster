@@ -15,6 +15,7 @@ from luster.types.websocket import ServerUpdateEventData
 from luster.channels import Category, channel_factory
 from luster.file import File
 from luster.system_messages import SystemMessages
+from luster.permissions import Permissions
 
 if TYPE_CHECKING:
     from io import BufferedReader
@@ -58,6 +59,8 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         The system messages channels assignments.
     categories: List[:class:`Category`]
         The list of categories associated to this server.
+    default_permissions: :class:`Permissions`
+        The default permissions across the server.
     """
 
     if TYPE_CHECKING:
@@ -74,6 +77,7 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         banner: Optional[File]
         system_messages: SystemMessages
         categories: List[Category]
+        permissions: Permissions
 
     __slots__ = (
         "_state",
@@ -90,6 +94,7 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         "banner",
         "system_messages",
         "categories",
+        "default_permissions",
     )
 
     def __init__(self, data: types.Server, state: State) -> None:
@@ -97,7 +102,7 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         self._update_from_data(data)
 
     def _update_from_data(self, data: types.Server):
-        # TODO: categories, roles, default_permissions
+        # TODO: categories, roles
         self.id = data["_id"]
         self.owner_id = data["owner"]
         self.name = data["name"]
@@ -108,6 +113,7 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         self.discoverable = data.get("discoverable", False)
         self.analytics = data.get("analytics", False)
         self.categories = [Category(c, self._state) for c in handle_optional_field(data, "categories", [], None)]
+        self.default_permissions = Permissions(data.get("default_permissions", 0))
 
         icon = data.get("icon")
         banner = data.get("banner")
@@ -169,6 +175,10 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
     @handle_update("channels")
     def _handle_update_channels(self, new: List[str]) -> None:
         self.channel_ids = new
+
+    @handle_update("default_permissions")
+    def _handle_update_default_permissions(self, new: int) -> None:
+        self.default_permissions = Permissions(new)
 
     def channels(self) -> List[ServerChannel]:
         """The list of channels in this server.
