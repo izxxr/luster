@@ -228,11 +228,14 @@ class ServerChannel(_EditChannelMixin, UpdateHandler[ChannelUpdateEventData]):
 
     @property
     def role_permissions(self) -> Mapping[str, PermissionOverwrite]:
-        """The default permission overwrite on this channel.
+        """The role permissions of this channel.
+
+        This returns a mapping with key being the ID of role and
+        value being the permission overwrite for that role.
 
         Returns
         -------
-        :class:`PermissionOverwrite`
+        Mapping[:class:`str`, :class:`PermissionOverwrite`]
         """
         permissions: Mapping[str, PermissionOverwrite] = {}
 
