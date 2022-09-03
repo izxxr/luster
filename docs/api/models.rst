@@ -2,6 +2,13 @@
 
 .. _api-models:
 
+..  Refactor this page to be referred as classes or some other name instead.
+    Document the following classes:
+
+    - PermissionOverwrite
+    - Role
+
+
 Data Models
 ===========
 

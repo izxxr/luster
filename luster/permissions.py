@@ -5,11 +5,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, TypeVar
 from typing_extensions import Self
+
+from luster.internal.mixins import StateAware
 from luster.flags import BaseFlags
+
+if TYPE_CHECKING:
+    from luster.state import State
+    from luster import types
 
 __all__ = (
     "Permissions",
     "PermissionOverwrite",
+    "Role",
 )
 
 
@@ -276,3 +283,63 @@ class PermissionOverwrite:
                 setattr(overwrite, flag, False)
 
         return overwrite
+
+
+class Role(StateAware):
+    """Represents a server role.
+
+    Attributes
+    ----------
+    id: :class:`str`
+        The ID of role.
+    name: :class:`str`
+        The name of role.
+    colour: Optional[:class:`str`]
+        The CSS representation of role's colour.
+    hoist: :class:`bool`
+        Whether this role is displayed separate from others.
+    rank: :class:`int`
+        The rank of role in hierarchy.
+    """
+    __slots__ = (
+        "id",
+        "name",
+        "colour",
+        "hoist",
+        "rank",
+        "_state",
+        "_permissions",
+    )
+
+    if TYPE_CHECKING:
+        id: str
+        name: str
+        colour: Optional[str]
+        hoist: bool
+        rank: int
+
+    def __init__(self, role_id: str, data: types.Role, state: State) -> None:
+        self.id = role_id
+        self._state = state
+        self._update_from_data(data)
+
+    def _update_from_data(self, data: types.Role) -> None:
+        self.name = data["name"]
+        self.colour = data.get("colour")
+        self.hoist = data.get("hoist", False)
+        self.rank = data.get("rank", 0)
+        self._permissions = data.get("permissions", {"a": 0, "d": 0})
+
+    @property
+    def permissions(self) -> PermissionOverwrite:
+        """The permissions of this role.
+
+        Returns
+        -------
+        :class:`PermissionOverwrite`
+        """
+        permissions = self._permissions
+        return PermissionOverwrite.from_pair(
+            Permissions(permissions["a"]),
+            Permissions(permissions["d"]),
+        )

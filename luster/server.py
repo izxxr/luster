@@ -15,7 +15,7 @@ from luster.types.websocket import ServerUpdateEventData
 from luster.channels import Category, channel_factory
 from luster.file import File
 from luster.system_messages import SystemMessages
-from luster.permissions import Permissions
+from luster.permissions import Permissions, Role
 
 if TYPE_CHECKING:
     from io import BufferedReader
@@ -61,6 +61,8 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         The list of categories associated to this server.
     default_permissions: :class:`Permissions`
         The default permissions across the server.
+    roles: List[:class:`Role`]
+        The list of roles in this server.
     """
 
     if TYPE_CHECKING:
@@ -78,6 +80,7 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         system_messages: SystemMessages
         categories: List[Category]
         permissions: Permissions
+        roles: List[Role]
 
     __slots__ = (
         "_state",
@@ -95,6 +98,7 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         "system_messages",
         "categories",
         "default_permissions",
+        "roles",
     )
 
     def __init__(self, data: types.Server, state: State) -> None:
@@ -122,6 +126,12 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         self.icon = File(icon, self._state) if icon else None
         self.banner = File(banner, self._state) if banner else None
         self.system_messages = SystemMessages.from_dict(system_messages, state=self._state)
+
+        roles: List[Role] = []
+        for role_id, role in data.get("roles", {}).items():
+            roles.append(Role(role_id, role, self._state))
+
+        self.roles = roles
 
     def handle_field_removals(self, fields: List[types.ServerRemoveField]) -> None:
         for field in fields:
