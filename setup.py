@@ -2,7 +2,7 @@ from setuptools import setup
 
 
 VERSION = "0.1.0a3"
-GITHUB = "https://github.com/nerdguyahmad/luster"
+GITHUB = "https://github.com/izxxr/luster"
 DOCUMENTATION = "https://luster.readthedocs.io"
 LICENSE = "MIT"
 PACKAGES = [
@@ -32,7 +32,7 @@ EXTRA_REQUIREMENTS = {
 
 setup(
     name="luster",
-    author="nerdguyahmad",
+    author="izxxr",
     version=VERSION,
     license=LICENSE,
     url=GITHUB,
