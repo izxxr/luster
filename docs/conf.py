@@ -19,8 +19,8 @@ sys.path.insert(0, os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 
 project = 'Luster'
-copyright = '2022, I. Ahmad (nerdguyahmad)'
-author = 'I. Ahmad (nerdguyahmad)'
+copyright = '2022, I. Ahmad (izxxr)'
+author = 'I. Ahmad (izxxr)'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
