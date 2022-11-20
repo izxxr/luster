@@ -9,8 +9,8 @@ Luster is currently not a mature library and is undergoing heavy development. In
 Any contribution is plays an important role in progress of this library. So, Thank you for showing
 interest in contributing to Luster.
 
-Bug reports, feature requests should be submitted using `GitHub issues tracker <https://github.com/nerdguyahmad/luster/issues>`_
-and code contributions should be done using `GitHub Pull Requests <https://github.com/nerdguyahmad/luster/pulls>`_
+Bug reports, feature requests should be submitted using `GitHub issues tracker <https://github.com/izxxr/luster/issues>`_
+and code contributions should be done using `GitHub Pull Requests <https://github.com/izxxr/luster/pulls>`_
 
 Major Changes
 -------------
