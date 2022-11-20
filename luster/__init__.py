@@ -7,9 +7,9 @@ Python library for Revolt.chat API.
 
 __version__ = "0.1.0a3"
 __license__ = "MIT"
-__notice__ = "Copyright (c) I. Ahmad (nerdguyahmad) 2022-2023"
-__author__ = "I. Ahmad (nerdguyahmad) <nerdguyahmad.contact@gmail.com>"
-__url__ = "https://github.com/nerdguyahmad/luster"
+__notice__ = "Copyright (c) I. Ahmad (izxxr) 2022-2023"
+__author__ = "I. Ahmad (izxxr) <nerdguyahmad.contact@gmail.com>"
+__url__ = "https://github.com/izxxr/luster"
 
 
 # Sort alphabatically
