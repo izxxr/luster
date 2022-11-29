@@ -14,7 +14,7 @@ ease of navigation, this section is further divided into sub-sections.
 
     client
     events
-    models
+    classes
     enums
     caching
     handlers

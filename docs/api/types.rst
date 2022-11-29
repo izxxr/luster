@@ -603,3 +603,21 @@ ChannelGroupLeaveEvent
 
 .. autoclass:: ChannelGroupLeaveEvent()
     :members:
+
+ServerRoleUpdateEvent
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerRoleUpdateEvent()
+    :members:
+
+ServerRoleUpdateEventData
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerRoleUpdateEventData()
+    :members:
+
+ServerRoleDeleteEvent
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerRoleDeleteEvent()
+    :members:

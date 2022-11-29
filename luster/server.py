@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Literal, Optional, Union, overload
+from typing import TYPE_CHECKING, List, Literal, Optional, Union, Dict, overload
 from luster.internal.helpers import (
     MISSING,
     get_attachment_id,
@@ -80,7 +80,7 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         system_messages: SystemMessages
         categories: List[Category]
         permissions: Permissions
-        roles: List[Role]
+        _roles: Dict[str, Role]
 
     __slots__ = (
         "_state",
@@ -98,7 +98,7 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         "system_messages",
         "categories",
         "default_permissions",
-        "roles",
+        "_roles",
     )
 
     def __init__(self, data: types.Server, state: State) -> None:
@@ -127,11 +127,11 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         self.banner = File(banner, self._state) if banner else None
         self.system_messages = SystemMessages.from_dict(system_messages, state=self._state)
 
-        roles: List[Role] = []
+        roles: Dict[str, Role] = {}
         for role_id, role in data.get("roles", {}).items():
-            roles.append(Role(role_id, role, self._state))
+            roles[role_id] = Role(role_id, role, self._state)
 
-        self.roles = roles
+        self._roles = roles
 
     def handle_field_removals(self, fields: List[types.ServerRemoveField]) -> None:
         for field in fields:
@@ -190,8 +190,44 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
     def _handle_update_default_permissions(self, new: int) -> None:
         self.default_permissions = Permissions(new)
 
+    def roles(self) -> List[Role]:
+        """The list of roles in this server.
+
+        Returns
+        -------
+        List[:class:`Role`]
+        """
+        return list(self._roles.values())
+
+    def get_role(self, role_id: str) -> Optional[Role]:
+        """Returns the role related to given role ID.
+
+        If the role for given ID is not cached, None is returned.
+
+        Parameters
+        ----------
+        role_id: :class:`str`
+            The ID of role.
+
+        Returns
+        -------
+        Optional[:class:`Role`]
+            The looked up role, if present.
+        """
+        return self._roles.get(role_id)
+
+    def _remove_role(self, role_id: str) -> Optional[Role]:
+        return self._roles.pop(role_id, None)
+
+    def _add_role(self, role: Role) -> None:
+        self._roles[role.id] = role
+
     def channels(self) -> List[ServerChannel]:
         """The list of channels in this server.
+
+        Under the hood, this method finds channels related to this
+        server from global channel cache. If a channel is not cached,
+        it is not included in the returned list of channels.
 
         Returns
         -------

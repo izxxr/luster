@@ -1,24 +1,26 @@
 .. currentmodule:: luster
 
-.. _api-models:
+.. _api-data-classes:
 
-..  Refactor this page to be referred as classes or some other name instead.
-    Document the following classes:
+Data Classes
+============
 
-    - PermissionOverwrite
-    - Role
+Revolt API is packed with various complex data models and types. These classes wrap these
+data models in easy to use form so you don't have to worry about dealing with JSON and bitwise
+values, handling optional fields, default values etc. All of that workload is handled by the library.
+
+Bitwise Flags
+-------------
+
+Permissions
+~~~~~~~~~~~
+
+.. autoclass:: Permissions
+    :members:
 
 
-Data Models
-===========
-
-Revolt API is packed with various complex data models. These classes wrap these data models in
-easy to use form so you don't have to worry about dealing with JSON manually, handling optional
-fields, default values etc. All of that workload is handled by the library.
-
-
-Generic Models
---------------
+Generic Data Models
+-------------------
 
 BaseModel
 ~~~~~~~~~
@@ -32,18 +34,8 @@ Object
 .. autoclass:: Object
     :members:
 
-Bitwise Flags
--------------
-
-Permissions
-~~~~~~~~~~~
-
-.. autoclass:: Permissions
-    :members:
-
-
-Files
------
+Data Models
+-----------
 
 File
 ~~~~
@@ -56,9 +48,6 @@ PartialUploadedFile
 
 .. autoclass:: PartialUploadedFile
     :members:
-
-Users
------
 
 User
 ~~~~
@@ -91,9 +80,6 @@ PartialUserBot
 .. autoclass:: PartialUserBot
     :members:
 
-Servers
--------
-
 Server
 ~~~~~~
 
@@ -112,8 +98,11 @@ Category
 .. autoclass:: Category
     :members:
 
-Channels
---------
+Role
+~~~~
+
+.. autoclass:: Role
+    :members:
 
 ServerChannel
 ~~~~~~~~~~~~~
@@ -155,4 +144,14 @@ Group
 ~~~~~
 
 .. autoclass:: Group
+    :members:
+
+
+Data Classes
+------------
+
+PermissionOverwrite
+~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: PermissionOverwrite
     :members:

@@ -147,3 +147,39 @@ GroupLeave
 
 .. autoclass:: GroupLeave
     :members:
+
+ServerRoleCreate
+~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerRoleCreate
+    :members:
+
+ServerRoleUpdate
+~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerRoleUpdate
+    :members:
+
+ServerRoleDelete
+~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerRoleDelete
+    :members:
+
+RoleCreate
+~~~~~~~~~~
+
+.. autoclass:: RoleCreate
+    :members:
+
+RoleUpdate
+~~~~~~~~~~
+
+.. autoclass:: RoleUpdate
+    :members:
+
+RoleDelete
+~~~~~~~~~~
+
+.. autoclass:: RoleDelete
+    :members:

@@ -3,15 +3,16 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar
 from typing_extensions import Self
 
 from luster.internal.mixins import StateAware
+from luster.internal.update_handler import UpdateHandler, handle_update
 from luster.flags import BaseFlags
+from luster import types
 
 if TYPE_CHECKING:
     from luster.state import State
-    from luster import types
 
 __all__ = (
     "Permissions",
@@ -285,7 +286,7 @@ class PermissionOverwrite:
         return overwrite
 
 
-class Role(StateAware):
+class Role(StateAware, UpdateHandler[types.ServerRoleUpdateEventData]):
     """Represents a server role.
 
     Attributes
@@ -330,6 +331,11 @@ class Role(StateAware):
         self.rank = data.get("rank", 0)
         self._permissions = data.get("permissions", {"a": 0, "d": 0})
 
+    def handle_field_removals(self, fields: List[types.RoleRemoveField]) -> None:
+        for field in fields:
+            if field == "Colour":
+                self.colour = None
+
     @property
     def permissions(self) -> PermissionOverwrite:
         """The permissions of this role.
@@ -343,3 +349,23 @@ class Role(StateAware):
             Permissions(permissions["a"]),
             Permissions(permissions["d"]),
         )
+
+    @handle_update("name")
+    def _handle_update_name(self, new: str) -> None:
+        self.name = new
+
+    @handle_update("colour")
+    def _handle_update_colour(self, new: str) -> None:
+        self.colour = new
+
+    @handle_update("hoist")
+    def _handle_update_hoist(self, new: bool) -> None:
+        self.hoist = new
+
+    @handle_update("rank")
+    def _handle_update_rank(self, new: int) -> None:
+        self.rank = new
+
+    @handle_update("permissions")
+    def _handle_update_permissions(self, new: types.Permissions) -> None:
+        self._permissions = new

@@ -22,6 +22,7 @@ __all__ = (
     "ChannelType",
     "ChannelRemoveField",
     "ServerRemoveField",
+    "RoleRemoveField",
 )
 
 
@@ -56,3 +57,6 @@ ChannelRemoveField = Literal["Description", "Icon", "DefaultPermissions"]
 
 # Servers
 ServerRemoveField = Literal["Description", "Categories", "SystemMessages", "Icon", "Banner"]
+
+# Roles
+RoleRemoveField = Literal["Colour"]
