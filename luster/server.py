@@ -106,7 +106,6 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         self._update_from_data(data)
 
     def _update_from_data(self, data: types.Server):
-        # TODO: categories, roles
         self.id = data["_id"]
         self.owner_id = data["owner"]
         self.name = data["name"]
