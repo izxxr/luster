@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Type, Union
+from typing_extensions import Self
 from luster.types.websocket import ChannelUpdateEventData
 from luster.internal.mixins import StateAware
 from luster.internal.update_handler import UpdateHandler, handle_update
@@ -61,7 +62,7 @@ class _EditChannelMixin(StateAware):
         description: Optional[str] = MISSING,
         icon: Optional[Union[str, BufferedReader]] = MISSING,
         nsfw: bool = MISSING,
-    ) -> None:
+    ) -> Optional[Self]:
         """Edits the channel.
 
         This requires the :attr:`Permissions.manage_channel` permission
@@ -80,6 +81,10 @@ class _EditChannelMixin(StateAware):
             |attachment-parameter-note|
         nsfw: :class:`bool`
             Whether this channel is marked as NSFW.
+
+        Returns
+        -------
+        The updated channel instance or None if no edits were done.
         """
         json = {}
         http = self._state.http_handler
@@ -261,6 +266,64 @@ class ServerChannel(_EditChannelMixin, UpdateHandler[ChannelUpdateEventData]):
         """
         await self._state.http_handler.delete_channel(self.id)
 
+    async def set_role_permissions(self, role: BaseModel, permissions: PermissionOverwrite) -> ServerChannel:
+        """Sets the permissions overrides for a specific role.
+
+        This operation requires the :attr:`Permissions.manage_permissions` permission in
+        the parent server.
+
+        Returns
+        -------
+        :class:`ServerChannel`
+            The updated channel.
+
+        Raises
+        ------
+        HTTPException
+            The operation failed.
+        HTTPForbidden
+            You are not allowed to do this.
+        """
+        a, d = permissions.pair()
+        json: types.SetChannelRolePermissionJSON = {
+            "permissions": {
+                "allow": a.value,
+                "deny": d.value,
+            }
+        }
+
+        data = await self._state.http_handler.set_channel_role_permission(self.id, role.id, json)
+        return ServerChannel(data, self._state)
+
+    async def set_default_permissions(self, permissions: PermissionOverwrite) -> ServerChannel:
+        """Sets the permissions overrides for the default role.
+
+        This operation requires the :attr:`Permissions.manage_permissions` permission in
+        the parent server.
+
+        Returns
+        -------
+        :class:`ServerChannel`
+            The updated channel.
+
+        Raises
+        ------
+        HTTPException
+            The operation failed.
+        HTTPForbidden
+            You are not allowed to do this.
+        """
+        a, d = permissions.pair()
+        json: types.SetChannelRolePermissionJSON = {
+            "permissions": {
+                "allow": a.value,
+                "deny": d.value,
+            }
+        }
+
+        data = await self._state.http_handler.set_channel_default_permission(self.id, json)
+        return ServerChannel(data, self._state)  # type: ignore  # data will always be a ServerChannel
+
 
 class TextChannel(ServerChannel):
     """Represents a text channel in a server.
@@ -438,7 +501,7 @@ class Group(PrivateChannel, _EditChannelMixin, UpdateHandler[ChannelUpdateEventD
         icon: Optional[File]
         nsfw: bool
         last_message_id: Optional[str]
-        default_permissions: Permissions
+        permissions: Permissions
 
     __slots__ = (
         "name",
@@ -448,7 +511,7 @@ class Group(PrivateChannel, _EditChannelMixin, UpdateHandler[ChannelUpdateEventD
         "icon",
         "nsfw",
         "last_message_id",
-        "default_permissions",
+        "permissions",
     )
 
     def _update_from_data(self, data: types.Group) -> None:
@@ -460,7 +523,7 @@ class Group(PrivateChannel, _EditChannelMixin, UpdateHandler[ChannelUpdateEventD
         self.description = data.get("description")
         self.nsfw = data.get("nsfw", False)
         self.last_message_id = data.get("last_message_id")
-        self.default_permissions = Permissions(data.get("permissions", 0))
+        self.permissions = Permissions(data.get("permissions", 0))
 
         icon = data.get("icon")
         self.icon = File(icon, self._state) if icon else None
@@ -494,7 +557,7 @@ class Group(PrivateChannel, _EditChannelMixin, UpdateHandler[ChannelUpdateEventD
 
     @handle_update("permissions")
     def _handle_update_permissions(self, new: int) -> None:
-        self.default_permissions = Permissions(new)
+        self.permissions = Permissions(new)
 
     async def fetch_owner(self) -> User:
         """Fetches the user that owns this group.
@@ -563,6 +626,35 @@ class Group(PrivateChannel, _EditChannelMixin, UpdateHandler[ChannelUpdateEventD
             The removal failed.
         """
         await self._state.http_handler.remove_group_member(self.id, user.id)
+
+    async def set_default_permissions(self, permissions: PermissionOverwrite) -> ServerChannel:
+        """Sets the permissions overrides for the default role.
+
+        This operation requires the :attr:`Permissions.manage_permissions` permission in
+        the parent server.
+
+        Returns
+        -------
+        :class:`Group`
+            The updated channel.
+
+        Raises
+        ------
+        HTTPException
+            The operation failed.
+        HTTPForbidden
+            You are not allowed to do this.
+        """
+        a, d = permissions.pair()
+        json: types.SetChannelRolePermissionJSON = {
+            "permissions": {
+                "allow": a.value,
+                "deny": d.value,
+            }
+        }
+
+        data = await self._state.http_handler.set_channel_default_permission(self.id, json)
+        return Group(data, self._state)  # type: ignore  # data will always be a GroupChannel
 
 
 class Category(StateAware):

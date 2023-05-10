@@ -7,6 +7,7 @@ from typing_extensions import NotRequired
 from luster.types.file import File
 from luster.types.roles import Permissions
 from luster.types.users import User
+from luster.types.roles import RequestPermissions
 
 if TYPE_CHECKING:
     from luster.types.enums import ChannelRemoveField
@@ -35,6 +36,10 @@ __all__ = (
     "FetchGroupMembersResponse",
     "AddGroupMemberResponse",
     "RemoveGroupMemberResponse",
+    "SetChannelRolePermissionJSON",
+    "SetChannelDefaultPermissionJSON",
+    "SetChannelRolePermissionResponse",
+    "SetChannelDefaultPermissionResponse",
 )
 
 
@@ -219,3 +224,21 @@ class CreateGroupJSON(TypedDict):
 FetchGroupMembersResponse = List[User]
 AddGroupMemberResponse = Literal[None]
 RemoveGroupMemberResponse = Literal[None]
+
+
+class SetChannelRolePermissionJSON(TypedDict):
+    """Represents the JSON body for :meth:`luster.HTTPHandler.set_channel_role_permission` route."""
+
+    permissions: RequestPermissions
+    """The new permissions for the role."""
+
+
+class SetChannelDefaultPermissionJSON(TypedDict):
+    """Represents the JSON body for :meth:`luster.HTTPHandler.set_channel_default_permission` route."""
+
+    permissions: RequestPermissions
+    """The new permissions for the default role."""
+
+
+SetChannelRolePermissionResponse = ServerChannel
+SetChannelDefaultPermissionResponse = Union[ServerChannel, Group]
