@@ -283,7 +283,18 @@ GroupLeave = ChannelGroupLeave
 
 @dataclass
 class ServerRoleCreate(BaseEvent):
-    """An event emitted when a server role is created."""
+    """An event emitted when a server role is created.
+    
+    .. note::
+        There is no such event in Revolt API as ``SERVER_ROLE_CREATE``. Internally,
+        when a role is created, the ``SERVER_ROLE_UPDATE`` event is triggered by
+        the websocket API. The library decides whether it is a create event or
+        update event by checking whether the targeted role is already present
+        in cache or not.
+
+        Although not seen often, if for some reason the cache is in an invalid
+        state, this may cause false positive dispatches. 
+    """
 
     server: Server
     """The server that the role belongs to."""
