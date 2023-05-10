@@ -27,6 +27,7 @@ if TYPE_CHECKING:
         RelationshipStatus,
         ServerRemoveField,
         ChannelRemoveField,
+        RoleRemoveField,
     )
 
 
@@ -56,6 +57,9 @@ __all__ = (
     "ChannelDeleteEvent",
     "ChannelGroupJoinEvent",
     "ChannelGroupLeaveEvent",
+    "ServerRoleUpdateEvent",
+    "ServerRoleUpdateEventData",
+    "ServerRoleDeleteEvent",
 )
 
 class BaseWebsocketEvent(TypedDict):
@@ -397,3 +401,57 @@ class ChannelGroupLeaveEvent(TypedDict):
 
     user: str
     """The ID of user that left."""
+
+
+class ServerRoleUpdateEventData(TypedDict, total=False):
+    """Represents the data of :class:`ServerRoleUpdateEvent`.
+
+    This is roughly equivalent to a role but all fields are optional.
+    """
+
+    name: str
+    """The name of role."""
+
+    hoist: bool
+    """Whether the role is shown separate from others."""
+
+    color: str
+    """The color for this role in any CSS compliant format."""
+
+    rank: int
+    """The rank of role."""
+
+    permissions: Permissions
+    """The permissions of role."""
+
+
+class ServerRoleUpdateEvent(TypedDict):
+    """Represents an event indicating update of a server role."""
+
+    type: Literal["ServerRoleUpdate"]
+    """The type of event."""
+
+    id: str
+    """The ID of server for which the role is updated."""
+
+    role_id: str
+    """The ID of role."""
+
+    data: ServerRoleUpdateEventData
+    """The updated data."""
+
+    clear: List[RoleRemoveField]
+    """The list of fields removed from role."""
+
+
+class ServerRoleDeleteEvent(TypedDict):
+    """Represents an event indicating deletion of a server role."""
+
+    type: Literal["ServerRoleDelete"]
+    """The type of event."""
+
+    id: str
+    """The ID of server for which the role is deleted."""
+
+    role_id: str
+    """The ID of role."""

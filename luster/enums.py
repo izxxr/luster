@@ -63,6 +63,24 @@ class WebsocketEvent:
     GROUP_LEAVE = CHANNEL_GROUP_LEAVE
     """An alias for :attr:`.CHANNEL_GROUP_LEAVE`"""
 
+    SERVER_ROLE_CREATE = "ServerRoleCreate"
+    """This event is emitted when a server role is created."""
+
+    SERVER_ROLE_UPDATE = "ServerRoleUpdate"
+    """This event is emitted when a server role is updated."""
+
+    SERVER_ROLE_DELETE = "ServerRoleDelete"
+    """This event is emitted when a server role is deleted."""
+
+    ROLE_CREATE = SERVER_ROLE_CREATE
+    """An alias for :attr:`.SERVER_ROLE_CREATE`"""
+
+    ROLE_UPDATE = SERVER_ROLE_UPDATE
+    """An alias for :attr:`.SERVER_ROLE_UPDATE`"""
+
+    ROLE_DELETE = SERVER_ROLE_DELETE
+    """An alias for :attr:`.SERVER_ROLE_DELETE`"""
+
 
 class FileType:
     """An enumeration detailing the values for type of a :class:`File`."""

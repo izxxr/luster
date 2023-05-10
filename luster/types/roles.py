@@ -30,7 +30,7 @@ class Role(TypedDict):
     permissions: Permissions
     """The permissions of this role."""
 
-    color: NotRequired[Optional[str]]
+    colour: NotRequired[Optional[str]]
     """The color of this role, this can be any valid CSS color."""
 
     hoist: NotRequired[bool]

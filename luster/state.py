@@ -21,7 +21,7 @@ class State:
 
     This class mainly serves the purpose of properly passing data
     and tracking state across different classes and specifically
-    :ref:`data models <api-models>`.
+    :ref:`data models <api-data-classes>`.
 
     You should not worry about this class when using :class:`Client`
     as it is automatically handled under the hood. However, when using

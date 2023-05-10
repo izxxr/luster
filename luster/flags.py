@@ -81,4 +81,15 @@ class BaseFlags:
                 cls.__valid_flags__[name] = member
                 setattr(cls, name, _FlagProxy(name, member))
 
-# TODO: Permissions
+    def __repr__(self) -> str:
+        flags = ", ".join("%s=%r" % (flag, self.get(flag)) for flag in self.__valid_flags__)
+        return f"<{self.__class__.__name__} {flags}>"
+
+    def __eq__(self, o: Any) -> bool:
+        return isinstance(o, self.__class__) and o.value == self.value
+
+    def __lt__(self, o: Any) -> bool:
+        return isinstance(o, self.__class__) and o.value <= self.value
+
+    def __gt__(self, o: Any) -> bool:
+        return isinstance(o, self.__class__) and o.value >= self.value
