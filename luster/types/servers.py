@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Dict, List, Literal, TypedDict, Optional
 from typing_extensions import NotRequired
 from luster.types.file import File
 from luster.types.channels import Category, ServerChannel
-from luster.types.roles import Role
+from luster.types.roles import Role, RequestPermissions
 
 if TYPE_CHECKING:
     from luster.types.enums import ServerRemoveField, ChannelTypeServer
@@ -25,6 +25,10 @@ __all__ = (
     "EditServerJSON",
     "EditServerResponse",
     "CreateServerChannelJSON",
+    "SetServerRolePermissionJSON",
+    "SetServerRolePermissionResponse",
+    "SetServerDefaultPermissionJSON",
+    "SetServerDefaultPermissionResponse",
 )
 
 
@@ -177,3 +181,23 @@ class CreateServerChannelJSON(TypedDict):
 
     nsfw: NotRequired[bool]
     """Whether to mark channel as NSFW."""
+
+
+class SetServerRolePermissionJSON(TypedDict):
+    """Represents the JSON body for :meth:`luster.HTTPHandler.set_server_role_permission` route."""
+
+    permissions: RequestPermissions
+    """The new permissions."""
+
+
+SetServerRolePermissionResponse = Server
+
+
+class SetServerDefaultPermissionJSON(TypedDict):
+    """Represents the JSON body for :meth:`lustr.HTTPHandler.set_server_default_permission` route."""
+
+    permissions: int
+    """The permissions bitwise value."""
+
+
+SetServerDefaultPermissionResponse = Server

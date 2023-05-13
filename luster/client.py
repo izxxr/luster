@@ -183,12 +183,12 @@ class Client(ListenersMixin):
         """
         return self.__state.user
 
-    def listen(self, event: types.EventTypeRecv) -> Callable[[Listener[BE]], Listener[BE]]:
+    def listen(self, event: str) -> Callable[[Listener[BE]], Listener[BE]]:
         """A decorator for registering an event listener.
 
         Parameters
         ----------
-        event: :class:`types.types.EventTypeRecv`
+        event: :class:`str`
             The event to listen to.
         """
         def __wrap(func: Listener[BE]) -> Listener[BE]:

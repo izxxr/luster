@@ -465,6 +465,60 @@ RemoveGroupMemberResponse
     A type alias representing the response of :meth:`luster.HTTPHandler.remove_group_member`
     route.
 
+SetChannelRolePermissionJSON
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SetChannelRolePermissionJSON()
+    :members:
+
+SetChannelRolePermissionResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: SetChannelRolePermissionResponse
+    
+    A type alias representing the response of :meth:`luster.HTTPHandler.set_channel_role_permission`.
+
+SetChannelDefaultPermissionJSON
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SetChannelDefaultPermissionJSON()
+    :members:
+
+SetChannelDefaultPermissionResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: SetChannelDefaultPermissionResponse
+    
+    A type alias representing the response of :meth:`luster.HTTPHandler.set_channel_default_permission`.
+
+
+SetServerRolePermissionJSON
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SetServerRolePermissionJSON()
+    :members:
+
+SetServerRolePermissionResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: SetServerRolePermissionResponse
+    
+    A type alias representing the response of :meth:`luster.HTTPHandler.set_server_role_permission`.
+
+SetServerDefaultPermissionJSON
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SetServerDefaultPermissionJSON()
+    :members:
+
+SetServerDefaultPermissionResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: SetServerDefaultPermissionResponse
+    
+    A type alias representing the response of :meth:`luster.HTTPHandler.set_server_default_permission`.
+
+
 Websocket Events
 ----------------
 
@@ -602,4 +656,22 @@ ChannelGroupLeaveEvent
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: ChannelGroupLeaveEvent()
+    :members:
+
+ServerRoleUpdateEvent
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerRoleUpdateEvent()
+    :members:
+
+ServerRoleUpdateEventData
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerRoleUpdateEventData()
+    :members:
+
+ServerRoleDeleteEvent
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ServerRoleDeleteEvent()
     :members:

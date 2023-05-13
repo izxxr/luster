@@ -17,6 +17,7 @@ from luster.users import User, Relationship
 from luster.server import Server
 from luster.enums import RelationshipStatus
 from luster.channels import channel_factory
+from luster.permissions import Role
 from luster import events
 
 import asyncio
@@ -46,11 +47,11 @@ class ListenersMixin(ABC):
     def _get_events_handler(self) -> EventsHandler:
         ...
 
-    def walk_listeners(self) -> List[Tuple[EventTypeRecv, List[Listener[Any]]]]:
+    def walk_listeners(self) -> List[Tuple[str, List[Listener[Any]]]]:
         """Returns the list of tuples of event name and listeners.
 
         The returned list contains tuples with first element
-        of type :class:`types.EventTypeRecv` and second element
+        of type :class:`str` (name of event) and second element
         being the list of listener callbacks for that event.
 
         For getting listeners for a specific event, use the
@@ -58,17 +59,17 @@ class ListenersMixin(ABC):
 
         Returns
         -------
-        List[Tuple[:class:`types.EventTypeRecv`, :class:`list`]]
+        List[Tuple[:class:`str`, :class:`list`]]
         """
         handler = self._get_events_handler()
         return list(handler.listeners.items())
 
-    def get_listeners(self, event: EventTypeRecv) -> List[Listener[Any]]:
+    def get_listeners(self, event: str) -> List[Listener[Any]]:
         """Returns the listeners for the given websocket event.
 
         Parameters
         ----------
-        event: :class:`types.EventTypeRecv`
+        event: :class:`str`
             The event to get listeners for.
 
         Returns
@@ -78,12 +79,12 @@ class ListenersMixin(ABC):
         handler = self._get_events_handler()
         return handler.listeners.get(event, [])
 
-    def add_listener(self, event: EventTypeRecv, callback: Listener[Any]) -> None:
+    def add_listener(self, event: str, callback: Listener[Any]) -> None:
         """Registers an event listener for the given event.
 
         Parameters
         ----------
-        event: :class:`types.EventTypeRecv`
+        event: :class:`str`
             The event to add listener for.
         callback: Callable[[:class:`BaseEvent`], Any]
             The listener callback.
@@ -104,14 +105,14 @@ class ListenersMixin(ABC):
         else:
             listeners[event] = [callback]
 
-    def clear_listeners(self, event: EventTypeRecv) -> List[Listener[Any]]:
+    def clear_listeners(self, event: str) -> List[Listener[Any]]:
         """Removes all the listeners for the given websocket event.
 
         Returns the list of removed listeners.
 
         Parameters
         ----------
-        event: :class:`types.EventTypeRecv`
+        event: :class:`str`
             The event to get listeners for.
 
         Returns
@@ -121,7 +122,7 @@ class ListenersMixin(ABC):
         handler = self._get_events_handler()
         return handler.listeners.pop(event, [])
 
-    def remove_listener(self, event: EventTypeRecv, callback: Listener[Any]) -> bool:
+    def remove_listener(self, event: str, callback: Listener[Any]) -> bool:
         """Removes an event listener for the given event.
 
         This method does not raise any error if given listener
@@ -130,7 +131,7 @@ class ListenersMixin(ABC):
 
         Parameters
         ----------
-        event: :class:`types.EventTypeRecv`
+        event: :class:`str`
             The event to remove the listener for.
         callback: Callable[[:class:`BaseEvent`], Any]
             The listener callback to remove.
@@ -206,7 +207,7 @@ class EventsHandler(ListenersMixin):
     def __init__(self, state: State) -> None:
         self._state = state
         self.__handlers: Dict[EventTypeRecv, Handler] = {}
-        self.listeners: Dict[EventTypeRecv, List[Listener[Any]]] = {}
+        self.listeners: Dict[str, List[Listener[Any]]] = {}
 
         for _, member in inspect.getmembers(self):
             if hasattr(member, "__luster_event_handler__"):
@@ -440,4 +441,63 @@ class EventsHandler(ListenersMixin):
         user = cache.get_user(user_id)
         event = events.ChannelGroupLeave(channel=channel, user=user, user_id=user_id)  # type: ignore
 
+        self.call_listeners(event)
+
+    @event_handler("ServerRoleUpdate")
+    async def on_server_role_update(self, data: types.ServerRoleUpdateEvent) -> None:
+        server_id = data["id"]
+        server = self._state.cache.get_server(server_id)
+
+        if server is None:
+            _LOGGER.debug("(ServerRoleUpdate) Server %r is not cached.", server_id)
+            return
+
+        role_id = data["role_id"]
+        role = server.get_role(role_id)
+
+        # Revolt API does not dispatch any ServerRoleCreate event
+        # on role creations. A ServerRoleUpdate event is sent instead
+        # so if the role isn't cached, we will assume that it is a create
+        # event. This assumption might lead to some (rare) false-positive
+        # dispatches but ultimately, there's no other option.
+        if role is None:
+            # data['data'] should be equivalent to types.Role
+            role = Role(role_id, data["data"], state=self._state)  # type: ignore
+            server._add_role(role)  # type: ignore
+            event = events.ServerRoleCreate(
+                role=role,
+                server=server,
+            )
+        else:
+            before = copy.copy(role)
+            role.update(data["data"])
+            role.handle_field_removals(data["clear"])
+            event = events.ServerRoleUpdate(
+                server=server,
+                before=before,
+                after=role,
+            )
+
+        self.call_listeners(event)
+
+    @event_handler("ServerRoleDelete")
+    async def on_server_role_delete(self, data: types.ServerRoleDeleteEvent) -> None:
+        server_id = data["id"]
+        server = self._state.cache.get_server(server_id)
+
+        if server is None:
+            _LOGGER.debug("(ServerRoleDelete) Server %r is not cached.", server_id)
+            return
+
+        role_id = data["role_id"]
+        role = server._remove_role(role_id)  # type: ignore
+
+        if role is None:
+            _LOGGER.debug("(ServerRoleDelete) Role %r is not cached.", role_id)
+            return
+
+        event = events.ServerRoleDelete(
+            server=server,
+            role=role,
+        )
         self.call_listeners(event)

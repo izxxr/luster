@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from luster.users import User, Relationship
     from luster.server import Server
     from luster.channels import ServerChannel, ChannelT, Group
+    from luster.permissions import Role
 
 __all__ = (
     "BaseEvent",
@@ -31,6 +32,12 @@ __all__ = (
     "ChannelGroupLeave",
     "GroupJoin",
     "GroupLeave",
+    "ServerRoleCreate",
+    "RoleCreate",
+    "ServerRoleUpdate",
+    "RoleUpdate",
+    "ServerRoleDelete",
+    "RoleDelete",
 )
 
 
@@ -42,12 +49,13 @@ class BaseEvent(ABC):
     """
 
     @abstractmethod
-    def get_event_name(self) -> types.EventTypeRecv:
+    def get_event_name(self) -> str:
         """Gets the name of event.
 
         Returns
         -------
-        :class:`luster.types.EventTypeRecv`
+        :class:`str`
+            The name of event.
         """
 
 
@@ -271,3 +279,71 @@ GroupJoin = ChannelGroupJoin
 
 GroupLeave = ChannelGroupLeave
 """An alias for :class:`ChannelGroupLeave`."""
+
+
+@dataclass
+class ServerRoleCreate(BaseEvent):
+    """An event emitted when a server role is created.
+    
+    .. note::
+        There is no such event in Revolt API as ``SERVER_ROLE_CREATE``. Internally,
+        when a role is created, the ``SERVER_ROLE_UPDATE`` event is triggered by
+        the websocket API. The library decides whether it is a create event or
+        update event by checking whether the targeted role is already present
+        in cache or not.
+
+        Although not seen often, if for some reason the cache is in an invalid
+        state, this may cause false positive dispatches. 
+    """
+
+    server: Server
+    """The server that the role belongs to."""
+
+    role: Role
+    """The created role."""
+
+    def get_event_name(self) -> str:
+        return WebsocketEvent.SERVER_ROLE_CREATE
+
+
+RoleCreate = ServerRoleCreate
+"""An alias for :class:`ServerRoleCreate`."""
+
+
+@dataclass
+class ServerRoleUpdate(BaseEvent):
+    """An event emitted when a server role is updated."""
+
+    server: Server
+    """The server that the role belongs to."""
+
+    before: Role
+    """The role before the update."""
+
+    after: Role
+    """The updated role."""
+
+    def get_event_name(self) -> types.EventTypeRecv:
+        return WebsocketEvent.SERVER_ROLE_UPDATE
+
+
+RoleUpdate = ServerRoleUpdate
+"""An alias of :class:`ServerRoleUpdate`."""
+
+
+@dataclass
+class ServerRoleDelete(BaseEvent):
+    """An event emitted when a server role is delete."""
+
+    server: Server
+    """The server that the role belongs to."""
+
+    role: Role
+    """The role that was deleted."""
+
+    def get_event_name(self) -> types.EventTypeRecv:
+        return WebsocketEvent.SERVER_ROLE_DELETE
+
+
+RoleDelete = ServerRoleDelete
+"""An alias of :class:`ServerRoleUpdate`."""

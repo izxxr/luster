@@ -17,10 +17,10 @@ def handle_update(field: str) -> Callable[[Handler], Handler]:
 
 
 class UpdateHandler(Generic[DataT]):
-    __update_handlers__: Dict[str, Handler] = {}
+    __update_handlers__: Dict[str, Handler]
 
     def __init_subclass__(cls) -> None:
-        handlers = cls.__update_handlers__
+        cls.__update_handlers__ = handlers = {}
 
         for _, member in inspect.getmembers(cls):
             try:

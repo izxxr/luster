@@ -26,11 +26,13 @@ Additions
     - Add :func:`HTTPHandler.upload_file` to allow uploading files.
     - Add :func:`Client.upload_file` to allow uploading files.
 
-- Add support for users.
-    - Add API types for users.
-    - Add HTTP methods for users in :class:`HTTPHandler`.
-    - Add :class:`User`, :class:`Profile`, :class:`Status`, :class:`PartialUserBot` and :class:`Relationship` classes.
-    - Add :class:`events.UserUpdate` and :class:`events.UserRelationship` events.
+- Add support for various API entities
+
+Bug Fixes & Improvements
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Fix bug with websocket updates handling logic that caused crashes.
+- :class:`WebsocketHandler` and all other classes dependent on it no longer allow multiple simultaneous websocket connections.
 
 Documentation Changes
 ~~~~~~~~~~~~~~~~~~~~~

@@ -7,6 +7,7 @@ from typing_extensions import NotRequired
 
 __all__ = (
     "Permissions",
+    "RequestPermissions",
     "Role",
 )
 
@@ -15,10 +16,24 @@ class Permissions(TypedDict):
     """Represents the permission mapping with allow and deny keys."""
 
     a: int
-    """The bitfield for allowed permissions."""
+    """The bitwise value for allowed permissions."""
 
     d: int
-    """The bitfield for denied permissions."""
+    """The bitwise for denied permissions."""
+
+
+class RequestPermissions(TypedDict):
+    """Represents permissions object used in HTTP requests.
+
+    This type differs from :class:`Permissions` as the object used for HTTP routes request
+    bodies has different naming scheme.
+    """
+
+    allow: int
+    """The bitwise value for allowed permissions."""
+
+    deny: int
+    """The bitwise for denied permissions."""
 
 
 class Role(TypedDict):
@@ -30,7 +45,7 @@ class Role(TypedDict):
     permissions: Permissions
     """The permissions of this role."""
 
-    color: NotRequired[Optional[str]]
+    colour: NotRequired[Optional[str]]
     """The color of this role, this can be any valid CSS color."""
 
     hoist: NotRequired[bool]
