@@ -492,6 +492,33 @@ SetChannelDefaultPermissionResponse
     A type alias representing the response of :meth:`luster.HTTPHandler.set_channel_default_permission`.
 
 
+SetServerRolePermissionJSON
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SetServerRolePermissionJSON()
+    :members:
+
+SetServerRolePermissionResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: SetServerRolePermissionResponse
+    
+    A type alias representing the response of :meth:`luster.HTTPHandler.set_server_role_permission`.
+
+SetServerDefaultPermissionJSON
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SetServerDefaultPermissionJSON()
+    :members:
+
+SetServerDefaultPermissionResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. data:: SetServerDefaultPermissionResponse
+    
+    A type alias representing the response of :meth:`luster.HTTPHandler.set_server_default_permission`.
+
+
 Websocket Events
 ----------------
 

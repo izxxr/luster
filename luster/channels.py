@@ -272,6 +272,13 @@ class ServerChannel(_EditChannelMixin, UpdateHandler[ChannelUpdateEventData]):
         This operation requires the :attr:`Permissions.manage_permissions` permission in
         the parent server.
 
+        Parameters
+        ----------
+        role: :class:`BaseModel`
+            The target role.
+        permissions: :class:`PermissionOverwrite`
+            The new permissions for given role.
+        
         Returns
         -------
         :class:`ServerChannel`
@@ -300,6 +307,11 @@ class ServerChannel(_EditChannelMixin, UpdateHandler[ChannelUpdateEventData]):
 
         This operation requires the :attr:`Permissions.manage_permissions` permission in
         the parent server.
+
+        Parameters
+        ----------
+        permissions: :class:`PermissionOverwrite`
+            The new permissions.
 
         Returns
         -------

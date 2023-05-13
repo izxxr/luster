@@ -16,6 +16,8 @@ from luster.channels import Category, channel_factory
 from luster.file import File
 from luster.system_messages import SystemMessages
 from luster.permissions import Permissions, Role
+from luster.protocols import BaseModel
+from luster.permissions import PermissionOverwrite
 
 if TYPE_CHECKING:
     from io import BufferedReader
@@ -416,3 +418,67 @@ class Server(StateAware, UpdateHandler[ServerUpdateEventData]):
         cls = channel_factory(data["channel_type"])
         # cls should always be Type[ServerChannel]
         return cls(data, self._state)  # type: ignore
+
+    async def set_role_permissions(self, role: BaseModel, permissions: PermissionOverwrite) -> Server:
+        """Sets the permissions for a specific role.
+
+        This operation requires the :attr:`Permissions.manage_permissions` permission in
+        the server.
+
+        Parameters
+        ----------
+        role: :class:`BaseModel`
+            The target role.
+        permissions: :class:`PermissionOverwrite`
+            The new permissions for given role.
+
+        Returns
+        -------
+        :class:`Server`
+            The updated server.
+
+        Raises
+        ------
+        HTTPException
+            The operation failed.
+        HTTPForbidden
+            You are not allowed to do this.
+        """
+        a, d = permissions.pair()
+        json: types.SetServerRolePermissionJSON = {
+            "permissions": {
+                "allow": a.value,
+                "deny": d.value,
+            }
+        }
+
+        data = await self._state.http_handler.set_server_role_permission(self.id, role.id, json)
+        return Server(data, self._state)
+
+    async def set_default_permissions(self, permissions: Permissions) -> Server:
+        """Sets the permissions for the default role.
+
+        This operation requires the :attr:`Permissions.manage_permissions` permission in
+        the parent server.
+
+        Parameters
+        ----------
+        permissions: :class:`Permissions`
+            The new permissions.
+
+        Returns
+        -------
+        :class:`Server`
+            The updated server.
+
+        Raises
+        ------
+        HTTPException
+            The operation failed.
+        HTTPForbidden
+            You are not allowed to do this.
+        """
+        json: types.SetServerDefaultPermissionJSON = {"permissions": permissions.value}
+        data = await self._state.http_handler.set_server_default_permission(self.id, json)
+        return Server(data, self._state)
+

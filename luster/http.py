@@ -550,6 +550,42 @@ class HTTPHandler(StateManagementMixin):
         data = await self.request("POST", f"/servers/{server_id}/channels", json=json)
         return data
 
+    async def set_server_role_permission(self, server_id: str, role_id: str, json: types.SetServerRolePermissionJSON) -> types.SetServerRolePermissionResponse:
+        """Sets permissions for a specific role in a server.
+
+        Parameters
+        ----------
+        server_id: :class:`str`
+            The ID of server to set the role permission for.
+        role_id: :class:`str`
+            The ID of role whose permission is being set.
+        json: :class:`types.SetServerRolePermissionJSON`
+            The new permissions data.
+
+        Returns
+        -------
+        :class:`types.SetServerRolePermissionResponse`
+        """
+        data = await self.request("PUT", f"/servers/{server_id}/permissions/{role_id}", json=json)
+        return data
+
+    async def set_server_default_permission(self, server_id: str, json: types.SetServerDefaultPermissionJSON) -> types.SetServerDefaultPermissionResponse:
+        """Sets permissions for the default role in a server.
+
+        Parameters
+        ----------
+        server_id: :class:`str`
+            The ID of server to set the role permission for.
+        json: :class:`types.SetServerRolePermissionJSON`
+            The new permissions data.
+
+        Returns
+        -------
+        :class:`types.SetServerDefaultPermissionResponse`
+        """
+        data = await self.request("PUT", f"/servers/{server_id}/permissions/default", json=json)
+        return data
+
     # Channels
 
     async def fetch_direct_message_channels(self) -> types.FetchDirectMessageChannelsResponse:

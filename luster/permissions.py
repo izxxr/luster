@@ -36,6 +36,11 @@ class Permissions(BaseFlags):
     - Equality operations
     - Less than and greater than operations
 
+    Note that this class is used in places where the permission can only take two values: enabled
+    or disabled. In some cases, their may be a third option of "inheriting" permissions from a
+    certain parent entity. In that case, :class:`PermissionOverwrite` is used instead. The
+    example is channel role permissions.
+
     Attributes
     ----------
     value: :class:`int`
